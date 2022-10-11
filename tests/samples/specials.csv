@@ -1,0 +1,7 @@
+name,description,id,idx
+Biocrystals,Increases the Exploration Modifier of your active ship by 5%,1,1000001
+Forgium,Increases the speed of all planetary upgrades by 5%,1,1000002
+Zeta Particles,Unlocks the technology Colonize Rogue Planets.,1,1000003
+Diamond Deposits,Increases Industry generation on all planets by 5%,2,2000001
+Antimatter,Increases the maximum movement points of your ship by 5%,4,4000001
+Forgium,Increases the speed of all planetary upgrades by 5%,5,5000001

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nebula-dash"
+version = "0.1.0"
+description = ""
+authors = ["tomfutago <tomfutago@gmail.com>"]
+readme = "README.md"
+packages = [{include = "nebula_dash"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^1.5.0"
+iconsdk = "^2.2.0"
+python-dotenv = "^0.21.0"
+SQLAlchemy = "^1.4.41"
+psycopg2-binary = "^2.9.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

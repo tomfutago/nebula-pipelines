@@ -1,0 +1,6 @@
+planet_id,planet_collectable_id,type,name,item_number,title,author,pieces,collectable_image,total_copies,copy_number,collection_id
+1,91,artwork,Dust,1,,Elias Stern,5,dust-1.jpg,10,1,1
+1,92,music,Arid Expanse,1,,Ewert Sundja,3,dust-sound-thumbnail-1.png,10,1,20
+1,93,lore,Witness,1,Introduction,Taavi Kusmin,5,,10,1,12
+3,94,artwork,Terrestrial,1,,Gabriel Gajdoš,5,terrestrial-1.jpg,10,1,6
+4,95,artwork,Ocean,1,,Elias Stern,5,ocean-1.jpg,10,1,4

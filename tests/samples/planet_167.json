@@ -1,0 +1,82 @@
+{
+    "id": 167,
+    "name": "Radeji",
+    "type": "lava",
+    "rarity": "uncommon",
+    "imagePath": "2013198306.png",
+    "description": "Radeji is a lava planet that is orbiting extremely close to its parent star. The immense gravity of the nearby star has resulted in extreme tidal heating, causing the surface of Radeji to be mostly, or entirely, covered in molten lava.",
+    "credits": 4,
+    "industry": 6,
+    "research": 4,
+    "surface": "solid",
+    "atmosphere": "dense",
+    "moons": 0,
+    "temperature": 671,
+    "radius": 5424,
+    "mass": "3.88E+24",
+    "gravity": "8.8",
+    "token_type": "planet",
+    "specials": [],
+    "upgrades": [
+        {
+            "planet_id": 167,
+            "upgrade_slot_id": 15125,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 40,
+            "upgrade_name": "L1 Discovery Probe Workshop",
+            "upgrade_description": "Allows you to craft the L1 Discovery Probes",
+            "completion_time": "2022-05-24 19:50:27.592367",
+            "updated_at": "2022-05-24 13:26:35.092367"
+        },
+        {
+            "planet_id": 167,
+            "upgrade_slot_id": 394,
+            "upgrade_slot_type": "credits",
+            "upgrade_id": 14,
+            "upgrade_name": "Secure Trade Routes III",
+            "upgrade_description": "Increases the Credits output of this planet by 5",
+            "completion_time": "2021-12-13 22:33:16.713328",
+            "updated_at": "2021-12-11 11:31:27.213328"
+        },
+        {
+            "planet_id": 167,
+            "upgrade_slot_id": 18499,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 8,
+            "upgrade_name": "Foundational Networks I",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 1",
+            "completion_time": "2021-09-29 17:26:19.715319",
+            "updated_at": "2021-09-28 20:22:49.715319"
+        }
+    ],
+    "collectables": {
+        "artwork": null,
+        "music": null,
+        "lore": null
+    },
+    "generation": "GEN-0",
+    "location": {
+        "sector_name": "Sirimana",
+        "region_name": "Euler’s Hope"
+    },
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/1200x1200/planets/2013198306.png",
+    "external_link": "https://play.projectnebula.app/planet/167",
+    "box": {
+        "box_id": 167,
+        "opened": true
+    },
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "GEN-0"
+        },
+        {
+            "key": "rarity",
+            "value": "uncommon"
+        },
+        {
+            "key": "type",
+            "value": "lava"
+        }
+    ]
+}

@@ -1,0 +1,157 @@
+{
+    "id": 1172,
+    "name": "Whitwick",
+    "type": "exotic",
+    "rarity": "legendary",
+    "imagePath": "193347041.png",
+    "description": "Exotic planets have enough anomalies in their makeup to be classified as such. Their surfaces, atmospheres, and lifeforms are as much dreamscapes for exploration and research as they are nightmares for proper scientific categorization. A proper study in Molecular Biology is often needed for colonization.",
+    "credits": 8,
+    "industry": 6,
+    "research": 24,
+    "surface": "solid",
+    "atmosphere": "moderate",
+    "moons": 4,
+    "temperature": -42,
+    "radius": 7780,
+    "mass": "7.34E+24",
+    "gravity": "8.08",
+    "token_type": "planet",
+    "specials": [
+        {
+            "name": "Antimatter",
+            "description": "Increases the maximum movement points of your ship by 5%"
+        },
+        {
+            "name": "Quartion Hybrids",
+            "description": "Unlocks the technology Colonize Gas Giants."
+        }
+    ],
+    "upgrades": [
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 2612,
+            "upgrade_slot_type": "credits",
+            "upgrade_id": 14,
+            "upgrade_name": "Secure Trade Routes III",
+            "upgrade_description": "Increases the Credits output of this planet by 5",
+            "completion_time": "2021-11-26 20:10:59.169095",
+            "updated_at": "2021-11-24 10:58:18.669095"
+        },
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 2614,
+            "upgrade_slot_type": "credits",
+            "upgrade_id": 28,
+            "upgrade_name": "Intergalactic Credit Exchange III",
+            "upgrade_description": "Increases your maximum Credits capacity by 100",
+            "completion_time": "2022-02-12 02:59:50.809286",
+            "updated_at": "2022-02-10 08:49:58.309286"
+        },
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 2615,
+            "upgrade_slot_type": "research",
+            "upgrade_id": 22,
+            "upgrade_name": "Advanced Research Lab IV",
+            "upgrade_description": "Increases the Research output of this planet by 7",
+            "completion_time": "2021-12-30 03:10:35.357291",
+            "updated_at": "2021-12-26 20:27:32.357291"
+        },
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 18026,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 49,
+            "upgrade_name": "Category-R2 Probe Workshop",
+            "upgrade_description": "Allows you to craft the Mi-PL1 and Tc-PL1 Preparation Probes",
+            "completion_time": "2022-05-26 05:34:26.833377",
+            "updated_at": "2022-05-25 15:11:25.333377"
+        },
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 21400,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 46,
+            "upgrade_name": "Category-U1 Probe Workshop",
+            "upgrade_description": "Allows you to craft the PN-PL1 and YN-PL1 Preparation Probes",
+            "completion_time": "2022-07-05 00:57:59.76079",
+            "updated_at": "2022-07-04 10:34:58.26079"
+        },
+        {
+            "planet_id": 1172,
+            "upgrade_slot_id": 2613,
+            "upgrade_slot_type": "credits",
+            "upgrade_id": 28,
+            "upgrade_name": "Intergalactic Credit Exchange III",
+            "upgrade_description": "Increases your maximum Credits capacity by 100",
+            "completion_time": "2022-04-23 05:10:08.49562",
+            "updated_at": "2022-04-21 13:10:41.49562"
+        }
+    ],
+    "collectables": {
+        "artwork": {
+            "planet_id": 1172,
+            "planet_collectable_id": 1060,
+            "type": "artwork",
+            "name": "Dark Aurora",
+            "item_number": 1,
+            "title": "NULL",
+            "author": "Elias Stern",
+            "pieces": 5,
+            "collectable_image": "dark-aurora-1.jpg",
+            "total_copies": 20,
+            "copy_number": 2,
+            "collection_id": 28
+        },
+        "music": {
+            "planet_id": 1172,
+            "planet_collectable_id": 1061,
+            "type": "music",
+            "name": "Abandon Protocol",
+            "item_number": 2,
+            "title": "NULL",
+            "author": "Ewert Sundja",
+            "pieces": 2,
+            "collectable_image": "abandon-protocol-2.jpg",
+            "total_copies": 30,
+            "copy_number": 1,
+            "collection_id": 49
+        },
+        "lore": {
+            "planet_id": 1172,
+            "planet_collectable_id": 1062,
+            "type": "lore",
+            "name": "Ones and Zeros",
+            "item_number": 6,
+            "title": "Comparing Crews",
+            "author": "Taavi Kusmin",
+            "pieces": 6,
+            "collectable_image": "NULL",
+            "total_copies": 25,
+            "copy_number": 2,
+            "collection_id": 53
+        }
+    },
+    "generation": "GEN-1",
+    "location": {
+        "sector_name": "Sjuntorp",
+        "region_name": "The Rift"
+    },
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/1200x1200/planets/193347041.png",
+    "external_link": "https://play.projectnebula.app/planet/1172",
+    "box": null,
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "GEN-1"
+        },
+        {
+            "key": "rarity",
+            "value": "legendary"
+        },
+        {
+            "key": "type",
+            "value": "exotic"
+        }
+    ]
+}
