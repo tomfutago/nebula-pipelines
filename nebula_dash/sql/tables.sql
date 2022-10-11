@@ -5,6 +5,7 @@ drop table if exists planets;
 drop table if exists planet_specials;
 drop table if exists planet_upgrades;
 drop table if exists planet_collectibles;
+drop table if exists planet_owners;
 */
 
 create table if not exists planet_specials (
@@ -55,7 +56,7 @@ create table if not exists planet_upgrades (
 );
 
 create table if not exists planet_collectibles (
-    planet_collectible_id integer not null constraint pk_planet_collectibles primary key,
+    planet_collectable_id integer not null constraint pk_planet_collectibles primary key,
     planet_id integer not null,
     collection_id integer not null,
     type varchar(10) not null,
@@ -66,7 +67,14 @@ create table if not exists planet_collectibles (
     pieces smallint not null,
     total_copies smallint not null,
     copy_number smallint not null,
-    collectible_image varchar(100) null,
+    collectable_image varchar(100) null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists planet_owners (
+    planet_id integer not null constraint pk_planet_owners primary key,
+    owner varchar(50) not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp null
 );
@@ -76,4 +84,5 @@ select * from planets;
 select * from planet_upgrades;
 select * from planet_specials;
 select * from planet_collectibles;
+select * from planet_owners;
 */

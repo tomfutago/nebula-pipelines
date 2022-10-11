@@ -225,3 +225,26 @@ data_transform_and_load(
     },
     extra_update_fields={"updated_at": "NOW()"}
 )
+
+
+############################################
+# retrieve current owners
+planet_owner_list = []
+
+for tokenId in range(1, 6): # range(1, totalSupply + 1):
+    owner = call(NebulaPlanetTokenCx, "ownerOf", {"_tokenId": tokenId})
+    print(tokenId, ":", owner)
+    planet_owner_list.append([tokenId, owner])
+
+df_planet_owners = pd.DataFrame(planet_owner_list, columns=["planet_id","owner"])
+df_planet_owners.to_csv("./tests/samples/owners.csv", index=False)
+
+# prep and upsert data
+data_transform_and_load(
+    df_to_load=df_planet_owners,
+    table_name="planet_owners",
+    list_of_col_names=[
+        "planet_id","owner"
+    ],
+    extra_update_fields={"updated_at": "NOW()"}
+)
