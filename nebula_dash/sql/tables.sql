@@ -9,6 +9,9 @@ drop table if exists planet_deposits;
 drop table if exists planet_deposits_discovered;
 drop table if exists planet_deposits_undiscovered;
 drop table if exists planet_owners;
+drop table if exists ships;
+drop table if exists ship_abilities;
+drop table if exists ship_owners;
 */
 
 create table if not exists planets (
@@ -117,6 +120,49 @@ create table if not exists planet_owners (
     updated_at timestamp null
 );
 
+create table if not exists ships (
+    ship_id integer not null constraint pk_ships primary key,
+    generation varchar(10) not null,
+    model_name varchar(100) not null,
+    given_name varchar(100) null,
+    type varchar(30) not null,
+    tier varchar(10) not null,
+    set_type varchar(30) not null,
+    fuel smallint not null,
+    movement smallint not null,
+    exploration smallint not null,
+    colonization smallint not null,
+    available_fuel integer not null,
+    deploy_bonus_cooldown varchar(30) null,
+    description varchar(500) not null,
+    bonus_text varchar(500) null,
+    special varchar(200) null,
+    image varchar(100) not null,
+    external_link varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists ship_abilities (
+    ship_id integer not null constraint pk_ship_abilities primary key,
+    ship_ability_id integer not null,
+    name varchar(50) not null,
+    description varchar(300) not null,
+    type varchar(30) not null,
+    value smallint not null,
+    image_path varchar(100) not null,
+    sound_path varchar(100) null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists ship_owners (
+    ship_id integer not null constraint pk_ship_owners primary key,
+    owner varchar(50) null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
 /*
 select * from planets;
 select * from planet_upgrades;
@@ -126,4 +172,7 @@ select * from planet_deposits;
 select * from planet_deposits_discovered;
 select * from planet_deposits_undiscovered;
 select * from planet_owners;
+select * from ships;
+select * from ship_abilities;
+select * from ship_owners;
 */
