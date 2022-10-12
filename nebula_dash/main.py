@@ -166,7 +166,7 @@ def pull_planet_data():
 
     # -----------------------
     df_planets = pd.concat(planet_list)
-    df_planets.to_csv("./tests/samples/planets.csv", index=False)
+    #df_planets.to_csv("./tests/samples/planets.csv", index=False)
 
     # prep and upsert data
     data_transform_and_load(
@@ -316,10 +316,80 @@ def pull_planet_owners():
 
 ############################################
 def pull_ship_data():
-    pass
+    # retrieve total supply of tokens and convert hex result to int
+    totalSupply = hex_to_int(call(NebulaSpaceshipTokenCx, "totalSupply", {}))
+    ship_list = []
+    ship_ability_list = []
+
+    for tokenId in range(1670, 1676): # range(1, totalSupply + 1):
+        #tokenInfo = requests.get(call(NebulaSpaceshipTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
+        api_url = "https://api.projectnebula.app/ship/" + str(tokenId)
+        tokenInfo = requests.get(api_url).json()
+        print(tokenId, ":", tokenInfo["model_name"])
+        
+        df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
+        dfa = pd.json_normalize(tokenInfo, record_path=["abilities"], meta=["ship_id"])
+
+        ship_list.append(df)
+        ship_ability_list.append(dfa)
+
+    # -----------------------
+    df_ships = pd.concat(ship_list)
+    #df_ships.to_csv("./tests/samples/ships.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_ships,
+        table_name="ships",
+        list_of_col_names=[
+            "ship_id","generation","model_name","given_name","type","tier","set_type",
+            "fuel","movement","exploration","colonization","available_fuel","deploy_bonus_cooldown",
+            "description","bonus_text","special","image","external_link"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+    # -----------------------
+    df_ship_abilities = pd.concat(ship_ability_list)
+    #df_ship_abilities.to_csv("./tests/samples/ship_abilities.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_ship_abilities,
+        table_name="ship_abilities",
+        list_of_col_names=[
+            "ship_id","ship_ability_id","name","description","type","value","image_path","sound_path"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+
+############################################
+def pull_ship_owners():
+    # retrieve current owners
+    ship_owner_list = []
+
+    for tokenId in range(1, 6): # range(1, totalSupply + 1):
+        owner = call(NebulaSpaceshipTokenCx, "ownerOf", {"_tokenId": tokenId})
+        print(tokenId, ":", owner)
+        ship_owner_list.append([tokenId, owner])
+
+    df_ship_owners = pd.DataFrame(ship_owner_list, columns=["ship_id","owner"])
+    df_ship_owners.to_csv("./tests/samples/ship_owners.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_ship_owners,
+        table_name="ship_owners",
+        list_of_col_names=[
+            "ship_id","owner"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
 
 ############################################
 #pull_planet_data()
 #pull_planet_owners()
 #pull_ship_data()
+pull_ship_owners()
