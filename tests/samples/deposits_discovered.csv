@@ -1,0 +1,9 @@
+planet_id,planet_layer_material_id,planet_layer_id,item_id,item_name,item_description,image_path,material_rarity,total_amount,prepared_amount,extracted_amount,preparable_amount,extractable_amount
+3,766,3,112,Amphoteric Substances,"Amphoteric Substances are refined and crafted into components, modules and other items.",Amphoteric_Substances.png,common,5051,0,0,5051,0
+3,11287,3,53,Ignis Ore,"Ignis Ore is refined and crafted into components, modules and other items.",Ignis_Ore.png,rare,851,0,0,851,0
+3,11288,3,105,Silicates,"Silicates are refined and crafted into components, modules and other items.",Silicates.png,abundant,2521,0,0,2521,0
+3,11289,3,54,Hyperspecular Crystals,"Hyperspecular Crystals are refined and crafted into components, modules and other items.",Hyperspecular_Crystals.png,uncommon,2544,0,0,2544,0
+3,585,6103,52,Organic Compounds,"Organic Compounds are refined and crafted into components, modules and other items.",Organic_Compound.png,common,1350,1350,0,0,1350
+3,586,6103,118,Platinyx,"Platinyx is refined and crafted into components, modules and other items.",Platinyx.png,uncommon,1147,230,0,917,230
+3,9538,6103,42,Base Minerals,"Base Minerals are refined and crafted into components, modules and other items.",Base_Mineral.png,abundant,2987,374,0,2613,374
+3,9539,6103,105,Silicates,"Silicates are refined and crafted into components, modules and other items.",Silicates.png,abundant,4386,439,0,3947,439

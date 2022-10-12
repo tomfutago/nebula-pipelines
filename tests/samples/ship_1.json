@@ -1,0 +1,37 @@
+{
+    "ship_id": 1,
+    "given_name": null,
+    "type": "exploration vessel ",
+    "tier": "II",
+    "description": "This well-kept vessel has seen its fair share of stars on both sides of the Gateway. The Red Light of Dawn became well-known after being awarded to Sophie Ibsen for her heroic acts during a large-scale attack on the Gate. The heroine herself installed several advanced systems allowing for easier surface exploration.",
+    "bonus_text": "First appeared in So It Goes - Part I",
+    "special": null,
+    "model_name": "Red Light of Dawn",
+    "image_path": "red-light-of-dawn",
+    "generation": "Lore Set I",
+    "set_type": "lore",
+    "fuel": 1200,
+    "movement": 13,
+    "exploration": 15,
+    "colonization": 14,
+    "available_fuel": 120000,
+    "token_type": "spaceship",
+    "abilities": [],
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/ships/red-light-of-dawn.png",
+    "external_link": "https://play.projectnebula.app/ship/1",
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "Lore Set I"
+        },
+        {
+            "key": "type",
+            "value": "exploration vessel "
+        },
+        {
+            "key": "tier",
+            "value": "II"
+        }
+    ],
+    "deploy_bonus_cooldown": null
+}

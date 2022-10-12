@@ -1,0 +1,185 @@
+{
+    "id": 4726,
+    "name": "Snohomish",
+    "type": "gas",
+    "rarity": "uncommon",
+    "imagePath": "461484627.png",
+    "description": "Gas giants are massive planets with no well-defined solid surface, making them particularly difficult to colonize.  Historically, they’ve pulled massive amounts of hydrogen and helium out from molecular clouds before their parent stars formed. Thanks to the science of Effluvium Reduction, colonization has been made possible in recent ages.",
+    "credits": 4,
+    "industry": 9,
+    "research": 4,
+    "surface": "gas",
+    "atmosphere": "dense",
+    "moons": 13,
+    "temperature": -118,
+    "radius": 137654,
+    "mass": "8.95E+27",
+    "gravity": "31.53",
+    "token_type": "planet",
+    "specials": [],
+    "upgrades": [
+        {
+            "planet_id": 4726,
+            "upgrade_slot_id": 7533,
+            "upgrade_slot_type": "industry",
+            "upgrade_id": 17,
+            "upgrade_name": "Production Facility III",
+            "upgrade_description": "Increases the Industry output of this planet by 5",
+            "completion_time": "2022-10-08 22:27:27.432967",
+            "updated_at": "2022-10-06 14:27:51.432967"
+        },
+        {
+            "planet_id": 4726,
+            "upgrade_slot_id": 7534,
+            "upgrade_slot_type": "industry",
+            "upgrade_id": 17,
+            "upgrade_name": "Production Facility III",
+            "upgrade_description": "Increases the Industry output of this planet by 5",
+            "completion_time": "2022-10-08 22:27:41.889526",
+            "updated_at": "2022-10-06 14:28:05.889526"
+        },
+        {
+            "planet_id": 4726,
+            "upgrade_slot_id": 17142,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 8,
+            "upgrade_name": "Foundational Networks I",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 1",
+            "completion_time": "2022-10-07 09:07:43.443276",
+            "updated_at": "2022-10-06 14:28:28.443276"
+        },
+        {
+            "planet_id": 4726,
+            "upgrade_slot_id": 20516,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 8,
+            "upgrade_name": "Foundational Networks I",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 1",
+            "completion_time": "2022-10-07 09:07:54.95156",
+            "updated_at": "2022-10-06 14:28:39.95156"
+        }
+    ],
+    "deposits": [
+        {
+            "layerNumber": 1,
+            "planet_layer_id": 3850,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 4726,
+                    "planet_layer_material_id": 13436,
+                    "planet_layer_id": 3850,
+                    "item_id": 128,
+                    "item_name": "Tchaikovium",
+                    "item_description": "Tchaikovium is refined and crafted into components, modules and other items.",
+                    "image_path": "Tchaikovium.png",
+                    "material_rarity": "rare",
+                    "total_amount": 849,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 849,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 4726,
+                    "planet_layer_material_id": 13437,
+                    "planet_layer_id": 3850,
+                    "item_id": 41,
+                    "item_name": "Xensium",
+                    "item_description": "Xensium is refined and crafted into components, modules and other items.",
+                    "image_path": "Xensium.png",
+                    "material_rarity": "uncommon",
+                    "total_amount": 2087,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2087,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 4726,
+                    "planet_layer_material_id": 13438,
+                    "planet_layer_id": 3850,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 5190,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 5190,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": []
+        },
+        {
+            "layerNumber": 2,
+            "planet_layer_id": 9950,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 4726,
+                    "planet_layer_material_id": 13439,
+                    "planet_layer_id": 9950,
+                    "item_id": 128,
+                    "item_name": "Tchaikovium",
+                    "item_description": "Tchaikovium is refined and crafted into components, modules and other items.",
+                    "image_path": "Tchaikovium.png",
+                    "material_rarity": "rare",
+                    "total_amount": 699,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 699,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 4726,
+                    "planet_layer_material_id": 13440,
+                    "planet_layer_id": 9950,
+                    "item_id": 113,
+                    "item_name": "Aerogens",
+                    "item_description": "Aerogens are refined and crafted into components, modules and other items.",
+                    "image_path": "Aerogens.png",
+                    "material_rarity": "common",
+                    "total_amount": 2827,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2827,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": [
+                {
+                    "image_path": "deposit-unknown.png",
+                    "size": "large"
+                }
+            ]
+        }
+    ],
+    "collectables": {
+        "artwork": null,
+        "music": null,
+        "lore": null
+    },
+    "generation": "GEN-1",
+    "location": {
+        "sector_name": "Ulungur",
+        "region_name": "Shroudlands"
+    },
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/1200x1200/planets/461484627.png",
+    "external_link": "https://play.projectnebula.app/planet/4726",
+    "box": null,
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "GEN-1"
+        },
+        {
+            "key": "rarity",
+            "value": "uncommon"
+        },
+        {
+            "key": "type",
+            "value": "gas"
+        }
+    ]
+}

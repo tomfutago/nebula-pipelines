@@ -1,0 +1,47 @@
+{
+    "ship_id": 1671,
+    "given_name": null,
+    "type": "colony ship",
+    "tier": "I",
+    "description": "The Chrysalis is the undisputed pride of the Terran fleet - a magnificent vessel, with its unique mix of power, size and Terran-style grace. Even when designing a ship more akin to a moving city, the Terrans did not forget to give the vessel the visual polish it deserved. The Chrysalis served the Terran Colonial Union well when arriving through the Gateway; as the TCU’s colonization phase slowed, they began to appear in public and private auctions.",
+    "bonus_text": "",
+    "special": null,
+    "model_name": "Chrysalis",
+    "image_path": "chrysalis",
+    "generation": "GEN-1",
+    "set_type": "core",
+    "fuel": 1100,
+    "movement": 14,
+    "exploration": 14,
+    "colonization": 16,
+    "available_fuel": 12268,
+    "token_type": "spaceship",
+    "abilities": [
+        {
+            "ship_ability_id": 1,
+            "name": "Integrated Hyperscan",
+            "description": "Activating the Terran Integrated Hyperscan explores all hexes adjacent to the vehicle, and can be used once every five days.",
+            "type": "active",
+            "value": 1,
+            "image_path": "integrated-hyperscan.png",
+            "sound_path": "Voidsweeper.m4a"
+        }
+    ],
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/ships/chrysalis.png",
+    "external_link": "https://play.projectnebula.app/ship/1671",
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "GEN-1"
+        },
+        {
+            "key": "type",
+            "value": "colony ship"
+        },
+        {
+            "key": "tier",
+            "value": "I"
+        }
+    ],
+    "deploy_bonus_cooldown": "13 hours"
+}

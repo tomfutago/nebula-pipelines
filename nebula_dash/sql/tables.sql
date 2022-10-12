@@ -5,10 +5,13 @@ drop table if exists planets;
 drop table if exists planet_specials;
 drop table if exists planet_upgrades;
 drop table if exists planet_collectibles;
+drop table if exists planet_deposits;
+drop table if exists planet_deposits_discovered;
+drop table if exists planet_deposits_undiscovered;
 drop table if exists planet_owners;
 */
 
-create table if not exists planet_specials (
+create table if not exists planets (
     planet_id integer not null constraint pk_planets primary key,
     generation varchar(10) not null,
     name varchar(50) not null,
@@ -36,7 +39,7 @@ create table if not exists planet_specials (
 );
 
 create table if not exists planet_specials (
-    id integer not null constraint pk_planet_specials primary key,
+    id bigint not null constraint pk_planet_specials primary key,
     planet_id integer not null,
     name varchar(50) not null,
     description varchar(300) not null,
@@ -56,7 +59,7 @@ create table if not exists planet_upgrades (
 );
 
 create table if not exists planet_collectibles (
-    planet_collectable_id integer not null constraint pk_planet_collectibles primary key,
+    planet_collectible_id integer not null constraint pk_planet_collectibles primary key,
     planet_id integer not null,
     collection_id integer not null,
     type varchar(10) not null,
@@ -67,14 +70,49 @@ create table if not exists planet_collectibles (
     pieces smallint not null,
     total_copies smallint not null,
     copy_number smallint not null,
-    collectable_image varchar(100) null,
+    collectible_image varchar(100) null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists planet_deposits (
+    planet_layer_id integer not null constraint pk_planet_deposits primary key,
+    planet_id integer not null,
+    layer_number smallint not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists planet_deposits_discovered (
+    planet_layer_material_id integer not null constraint pk_planet_deposits_discovered primary key,
+    planet_id integer not null,
+    planet_layer_id integer not null,
+    item_id smallint not null,
+    item_name varchar(50) not null,
+    item_description varchar(300) not null,
+    image_path varchar(100) not null,
+    material_rarity varchar(20) not null,
+    total_amount integer not null,
+    prepared_amount integer not null,
+    extracted_amount integer not null,
+    preparable_amount integer not null,
+    extractable_amount integer not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists planet_deposits_undiscovered (
+    id bigint not null constraint pk_planet_deposits_undiscovered primary key,
+    planet_layer_id integer not null,
+    size varchar(20) not null,
+    image_path varchar(100) null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp null
 );
 
 create table if not exists planet_owners (
     planet_id integer not null constraint pk_planet_owners primary key,
-    owner varchar(50) not null,
+    owner varchar(50) null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp null
 );
@@ -84,5 +122,8 @@ select * from planets;
 select * from planet_upgrades;
 select * from planet_specials;
 select * from planet_collectibles;
+select * from planet_deposits;
+select * from planet_deposits_discovered;
+select * from planet_deposits_undiscovered;
 select * from planet_owners;
 */

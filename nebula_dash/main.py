@@ -120,131 +120,206 @@ def data_transform_and_load(
 
 
 ############################################
-# retrieve total supply of tokens and convert hex result to int
-totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
-planet_list = []
-planet_upgrade_list = []
-planet_specials_list = []
-planet_collectibles_list = []
+def pull_planet_data():
+    # retrieve total supply of tokens and convert hex result to int
+    totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
+    planet_list = []
+    planet_upgrade_list = []
+    planet_specials_list = []
+    planet_collectibles_list = []
+    planet_deposit_list = []
+    planet_deposit_discovered_list = []
+    planet_deposit_undiscovered_list = []
 
-for tokenId in range(1, 6): # range(1, totalSupply + 1):
-    tokenInfo = requests.get(call(NebulaPlanetTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
-    print(tokenId, ":", tokenInfo["name"])
-    
-    df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
-    dfu = pd.json_normalize(tokenInfo, record_path=["upgrades"], meta=["id"])
-    dfs = pd.json_normalize(tokenInfo, record_path=["specials"], meta=["id"])
-    planet_list.append(df)
-    planet_upgrade_list.append(dfu)
-    planet_specials_list.append(dfs)
-    
-    dfc = pd.json_normalize(df["collectables_artwork"].to_list())
-    if not dfc.empty:
-        planet_collectibles_list.append(dfc)
-    
-    dfc = pd.json_normalize(df["collectables_music"].to_list())
-    if not dfc.empty:
-        planet_collectibles_list.append(dfc)
-    
-    dfc = pd.json_normalize(df["collectables_lore"].to_list())
-    if not dfc.empty:
-        planet_collectibles_list.append(dfc)
+    for tokenId in range(1, 6): # range(1, totalSupply + 1):
+        #tokenInfo = requests.get(call(NebulaPlanetTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
+        api_url = "https://api.projectnebula.app/planets/v3/" + str(tokenId)
+        tokenInfo = requests.get(api_url).json()
+        print(tokenId, ":", tokenInfo["name"])
+        
+        df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
+        dfu = pd.json_normalize(tokenInfo, record_path=["upgrades"], meta=["id"])
+        dfs = pd.json_normalize(tokenInfo, record_path=["specials"], meta=["id"])
+        dfp = pd.json_normalize(tokenInfo, record_path=["deposits"], meta=["id"])
+        dfpd = pd.json_normalize(tokenInfo["deposits"], record_path=["discoveredDeposits"])
+        dfpu = pd.json_normalize(tokenInfo["deposits"], record_path=["undiscoveredDeposits"], meta=["planet_layer_id"])
 
-# -----------------------
-df_planets = pd.concat(planet_list)
-df_planets.to_csv("./tests/samples/planets.csv", index=False)
+        planet_list.append(df)
+        planet_upgrade_list.append(dfu)
+        planet_specials_list.append(dfs)
+        planet_deposit_list.append(dfp)
+        planet_deposit_discovered_list.append(dfpd)
+        planet_deposit_undiscovered_list.append(dfpu)
+        
+        # collectibles (odd one)
+        dfc = pd.json_normalize(df["collectables_artwork"].to_list())
+        if not dfc.empty:
+            planet_collectibles_list.append(dfc)
+        
+        dfc = pd.json_normalize(df["collectables_music"].to_list())
+        if not dfc.empty:
+            planet_collectibles_list.append(dfc)
+        
+        dfc = pd.json_normalize(df["collectables_lore"].to_list())
+        if not dfc.empty:
+            planet_collectibles_list.append(dfc)
 
-# prep and upsert data
-data_transform_and_load(
-    df_to_load=df_planets,
-    table_name="planets",
-    list_of_col_names=[
-        "planet_id","generation","name","region","sector",
-        "type","rarity","credits","industry","research","surface",
-        "atmosphere","moons","temperature","radius","mass","gravity","description",
-        "box_id","box_opened","image","external_link"
-    ],
-    rename_mapper={
-        "id": "planet_id",
-        "location_region_name": "region",
-        "location_sector_name": "sector",
-        "box_box_id": "box_id"
-    },
-    extra_update_fields={"updated_at": "NOW()"}
-)
+    # -----------------------
+    df_planets = pd.concat(planet_list)
+    df_planets.to_csv("./tests/samples/planets.csv", index=False)
 
-# -----------------------
-df_planet_upgrades = pd.concat(planet_upgrade_list)
-df_planet_upgrades.to_csv("./tests/samples/upgrades.csv", index=False)
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planets,
+        table_name="planets",
+        list_of_col_names=[
+            "planet_id","generation","name","region","sector",
+            "type","rarity","credits","industry","research","surface",
+            "atmosphere","moons","temperature","radius","mass","gravity","description",
+            "box_id","box_opened","image","external_link"
+        ],
+        rename_mapper={
+            "id": "planet_id",
+            "location_region_name": "region",
+            "location_sector_name": "sector",
+            "box_box_id": "box_id"
+        },
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
-# prep and upsert data
-data_transform_and_load(
-    df_to_load=df_planet_upgrades,
-    table_name="planet_upgrades",
-    list_of_col_names=[
-        "upgrade_slot_id","planet_id","upgrade_slot_type","upgrade_id",
-        "upgrade_name","upgrade_description","completion_time","updated_at"
-    ]
-)
+    # -----------------------
+    df_planet_upgrades = pd.concat(planet_upgrade_list)
+    #df_planet_upgrades.to_csv("./tests/samples/upgrades.csv", index=False)
 
-# -----------------------
-df_planet_specials = pd.concat(planet_specials_list)
-df_planet_specials.sort_values(by=["id", "name"], inplace=True) # just in case as there's no PK on this dataset
-df_planet_specials["idx"] = df_planet_specials["id"] * 1000000 + df_planet_specials.index + 1 # generated PK
-df_planet_specials.to_csv("./tests/samples/specials.csv", index=False)
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_upgrades,
+        table_name="planet_upgrades",
+        list_of_col_names=[
+            "upgrade_slot_id","planet_id","upgrade_slot_type","upgrade_id",
+            "upgrade_name","upgrade_description","completion_time","updated_at"
+        ]
+    )
 
-# prep and upsert data
-data_transform_and_load(
-    df_to_load=df_planet_specials,
-    table_name="planet_specials",
-    list_of_col_names=[
-        "id", "planet_id", "name", "description"
-    ],
-    rename_mapper={
-        "id": "planet_id",
-        "idx": "id"
-    },
-    extra_update_fields={"updated_at": "NOW()"}
-)
+    # -----------------------
+    df_planet_specials = pd.concat(planet_specials_list)
+    df_planet_specials.sort_values(by=["id", "name"], inplace=True) # just in case as there's no PK on this dataset
+    df_planet_specials["idx"] = df_planet_specials["id"] * 1000000 + df_planet_specials.index + 1 # generated PK
+    #df_planet_specials.to_csv("./tests/samples/specials.csv", index=False)
 
-# -----------------------
-df_planet_collectibles = pd.concat(planet_collectibles_list)
-df_planet_collectibles.to_csv("./tests/samples/collectibles.csv", index=False)
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_specials,
+        table_name="planet_specials",
+        list_of_col_names=[
+            "id", "planet_id", "name", "description"
+        ],
+        rename_mapper={
+            "id": "planet_id",
+            "idx": "id"
+        },
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
-# prep and upsert data
-data_transform_and_load(
-    df_to_load=df_planet_collectibles,
-    table_name="planet_collectibles",
-    list_of_col_names=[
-        "planet_collectible_id","planet_id","collection_id","type","name","item_number",
-        "title","author","pieces","total_copies","copy_number","collectible_image"
-    ],
-    rename_mapper={
-        "planet_collectable_id": "planet_collectible_id",
-        "collectable_image": "collectible_image"
-    },
-    extra_update_fields={"updated_at": "NOW()"}
-)
+    # -----------------------
+    df_planet_collectibles = pd.concat(planet_collectibles_list)
+    #df_planet_collectibles.to_csv("./tests/samples/collectibles.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_collectibles,
+        table_name="planet_collectibles",
+        list_of_col_names=[
+            "planet_collectible_id","planet_id","collection_id","type","name","item_number",
+            "title","author","pieces","total_copies","copy_number","collectible_image"
+        ],
+        rename_mapper={
+            "planet_collectable_id": "planet_collectible_id",
+            "collectable_image": "collectible_image"
+        },
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+    # -----------------------
+    df_planet_deposits = pd.concat(planet_deposit_list)
+    #df_planet_deposits.to_csv("./tests/samples/deposits.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_deposits,
+        table_name="planet_deposits",
+        list_of_col_names=[
+            "planet_id","planet_layer_id","layer_number"
+        ],
+        rename_mapper={
+            "id": "planet_id",
+            "layerNumber": "layer_number"
+        },
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+    df_planet_deposits_discovered = pd.concat(planet_deposit_discovered_list)
+    #df_planet_deposits_discovered.to_csv("./tests/samples/deposits_discovered.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_deposits_discovered,
+        table_name="planet_deposits_discovered",
+        list_of_col_names=[
+            "planet_layer_material_id","planet_id","planet_layer_id","item_id","item_name","item_description","image_path",
+            "material_rarity","total_amount","prepared_amount","extracted_amount","preparable_amount","extractable_amount"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+    df_planet_deposits_undiscovered = pd.concat(planet_deposit_undiscovered_list)
+    df_planet_deposits_undiscovered["idx"] = df_planet_deposits_undiscovered["planet_layer_id"] * 1000000 + df_planet_deposits_undiscovered.index + 1 # generated PK
+    #df_planet_deposits_undiscovered.to_csv("./tests/samples/deposits_undiscovered.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_deposits_undiscovered,
+        table_name="planet_deposits_undiscovered",
+        list_of_col_names=[
+            "id","planet_layer_id","size","image_path"
+        ],
+        rename_mapper={
+            "idx": "id"
+        },
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
 
 ############################################
-# retrieve current owners
-planet_owner_list = []
+def pull_planet_owners():
+    # retrieve current owners
+    planet_owner_list = []
 
-for tokenId in range(1, 6): # range(1, totalSupply + 1):
-    owner = call(NebulaPlanetTokenCx, "ownerOf", {"_tokenId": tokenId})
-    print(tokenId, ":", owner)
-    planet_owner_list.append([tokenId, owner])
+    for tokenId in range(1, 6): # range(1, totalSupply + 1):
+        owner = call(NebulaPlanetTokenCx, "ownerOf", {"_tokenId": tokenId})
+        print(tokenId, ":", owner)
+        planet_owner_list.append([tokenId, owner])
 
-df_planet_owners = pd.DataFrame(planet_owner_list, columns=["planet_id","owner"])
-df_planet_owners.to_csv("./tests/samples/owners.csv", index=False)
+    df_planet_owners = pd.DataFrame(planet_owner_list, columns=["planet_id","owner"])
+    #df_planet_owners.to_csv("./tests/samples/owners.csv", index=False)
 
-# prep and upsert data
-data_transform_and_load(
-    df_to_load=df_planet_owners,
-    table_name="planet_owners",
-    list_of_col_names=[
-        "planet_id","owner"
-    ],
-    extra_update_fields={"updated_at": "NOW()"}
-)
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_owners,
+        table_name="planet_owners",
+        list_of_col_names=[
+            "planet_id","owner"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+
+############################################
+def pull_ship_data():
+    pass
+
+
+############################################
+#pull_planet_data()
+#pull_planet_owners()
+#pull_ship_data()

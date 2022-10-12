@@ -1,0 +1,390 @@
+{
+    "id": 1100,
+    "name": "Avastus",
+    "type": "exotic",
+    "rarity": "mythic",
+    "imagePath": "1543782852.png",
+    "description": "Avastus is an exotic planet with a solid surface, home to many mysterious phenomena. These phenomena have never been observed on any of the planets in humanity’s home galaxy.",
+    "credits": 13,
+    "industry": 20,
+    "research": 27,
+    "surface": "solid",
+    "atmosphere": "thin",
+    "moons": 1,
+    "temperature": 24,
+    "radius": 5736,
+    "mass": "4.96E+24",
+    "gravity": "10.06",
+    "token_type": "planet",
+    "specials": [
+        {
+            "name": "Biocrystals",
+            "description": "Increases the Exploration Modifier of your active ship by 5%"
+        },
+        {
+            "name": "Protofungi",
+            "description": "Increases Research generation on all planets by 5%"
+        },
+        {
+            "name": "Diamond Deposits",
+            "description": "Increases Industry generation on all planets by 5%"
+        }
+    ],
+    "upgrades": [
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2506,
+            "upgrade_slot_type": "research",
+            "upgrade_id": 22,
+            "upgrade_name": "Advanced Research Lab IV",
+            "upgrade_description": "Increases the Research output of this planet by 7",
+            "completion_time": "2021-09-26 15:19:27.619143",
+            "updated_at": "2021-09-23 09:41:08.494143"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2505,
+            "upgrade_slot_type": "industry",
+            "upgrade_id": 17,
+            "upgrade_name": "Production Facility III",
+            "upgrade_description": "Increases the Industry output of this planet by 5",
+            "completion_time": "2021-07-31 23:27:41.541243",
+            "updated_at": "2021-07-29 10:08:21.666243"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2507,
+            "upgrade_slot_type": "research",
+            "upgrade_id": 22,
+            "upgrade_name": "Advanced Research Lab IV",
+            "upgrade_description": "Increases the Research output of this planet by 7",
+            "completion_time": "2021-09-27 18:50:14.847958",
+            "updated_at": "2021-09-24 13:11:55.722958"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2503,
+            "upgrade_slot_type": "universal",
+            "upgrade_id": 11,
+            "upgrade_name": "Foundational Networks IV",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 4",
+            "completion_time": "2021-10-06 07:38:24.157658",
+            "updated_at": "2021-09-27 09:00:44.595158"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2504,
+            "upgrade_slot_type": "universal",
+            "upgrade_id": 11,
+            "upgrade_name": "Foundational Networks IV",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 4",
+            "completion_time": "2021-10-07 18:08:04.048089",
+            "updated_at": "2021-09-28 19:30:24.485589"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 15966,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 38,
+            "upgrade_name": "Rift Generator",
+            "upgrade_description": "Springboard for Rift Travel",
+            "completion_time": "2021-07-31 04:09:50.176623",
+            "updated_at": "2021-07-30 07:43:23.551623"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 19340,
+            "upgrade_slot_type": "basic",
+            "upgrade_id": 39,
+            "upgrade_name": "Rift Marker",
+            "upgrade_description": "Beacon for Rift Travel",
+            "completion_time": "2021-07-29 04:56:45.471591",
+            "updated_at": "2021-07-28 08:30:18.846591"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2502,
+            "upgrade_slot_type": "universal",
+            "upgrade_id": 11,
+            "upgrade_name": "Foundational Networks IV",
+            "upgrade_description": "Increases the Credits, Industry and Research output of this planet by 4",
+            "completion_time": "2021-10-04 15:32:55.397376",
+            "updated_at": "2021-09-25 16:55:15.834876"
+        },
+        {
+            "planet_id": 1100,
+            "upgrade_slot_id": 2508,
+            "upgrade_slot_type": "credits",
+            "upgrade_id": 14,
+            "upgrade_name": "Secure Trade Routes III",
+            "upgrade_description": "Increases the Credits output of this planet by 5",
+            "completion_time": "2021-08-07 21:35:53.038571",
+            "updated_at": "2021-08-05 08:16:33.163571"
+        }
+    ],
+    "deposits": [
+        {
+            "layerNumber": 1,
+            "planet_layer_id": 1100,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4620,
+                    "planet_layer_id": 1100,
+                    "item_id": 40,
+                    "item_name": "Polymetals",
+                    "item_description": "Polymetals are refined and crafted into components, modules and other items.",
+                    "image_path": "Polymetals.png",
+                    "material_rarity": "common",
+                    "total_amount": 1199,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 1199,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4621,
+                    "planet_layer_id": 1100,
+                    "item_id": 110,
+                    "item_name": "Plutonium",
+                    "item_description": "Plutonium is refined and crafted into components, modules and other items.",
+                    "image_path": "Plutonium.png",
+                    "material_rarity": "common",
+                    "total_amount": 1171,
+                    "prepared_amount": 235,
+                    "extracted_amount": 0,
+                    "preparable_amount": 936,
+                    "extractable_amount": 235
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4622,
+                    "planet_layer_id": 1100,
+                    "item_id": 40,
+                    "item_name": "Polymetals",
+                    "item_description": "Polymetals are refined and crafted into components, modules and other items.",
+                    "image_path": "Polymetals.png",
+                    "material_rarity": "common",
+                    "total_amount": 2811,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2811,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4623,
+                    "planet_layer_id": 1100,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 2888,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2888,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4624,
+                    "planet_layer_id": 1100,
+                    "item_id": 115,
+                    "item_name": "Nanofluids",
+                    "item_description": "Nanofluids are refined and crafted into components, modules and other items.",
+                    "image_path": "Nanofluids.png",
+                    "material_rarity": "common",
+                    "total_amount": 4273,
+                    "prepared_amount": 856,
+                    "extracted_amount": 0,
+                    "preparable_amount": 3417,
+                    "extractable_amount": 856
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4625,
+                    "planet_layer_id": 1100,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 5333,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 5333,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": []
+        },
+        {
+            "layerNumber": 2,
+            "planet_layer_id": 7200,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4626,
+                    "planet_layer_id": 7200,
+                    "item_id": 127,
+                    "item_name": "Microorganisms",
+                    "item_description": "Microorganisms are refined and crafted into components, modules and other items.",
+                    "image_path": "Microorganism.png",
+                    "material_rarity": "rare",
+                    "total_amount": 693,
+                    "prepared_amount": 693,
+                    "extracted_amount": 0,
+                    "preparable_amount": 0,
+                    "extractable_amount": 693
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4627,
+                    "planet_layer_id": 7200,
+                    "item_id": 127,
+                    "item_name": "Microorganisms",
+                    "item_description": "Microorganisms are refined and crafted into components, modules and other items.",
+                    "image_path": "Microorganism.png",
+                    "material_rarity": "rare",
+                    "total_amount": 663,
+                    "prepared_amount": 133,
+                    "extracted_amount": 0,
+                    "preparable_amount": 530,
+                    "extractable_amount": 133
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4628,
+                    "planet_layer_id": 7200,
+                    "item_id": 112,
+                    "item_name": "Amphoteric Substances",
+                    "item_description": "Amphoteric Substances are refined and crafted into components, modules and other items.",
+                    "image_path": "Amphoteric_Substances.png",
+                    "material_rarity": "common",
+                    "total_amount": 2993,
+                    "prepared_amount": 375,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2618,
+                    "extractable_amount": 375
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4629,
+                    "planet_layer_id": 7200,
+                    "item_id": 117,
+                    "item_name": "Yprasium",
+                    "item_description": "Yprasium is refined and crafted into components, modules and other items.",
+                    "image_path": "Yprasium.png",
+                    "material_rarity": "uncommon",
+                    "total_amount": 2753,
+                    "prepared_amount": 345,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2408,
+                    "extractable_amount": 345
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4630,
+                    "planet_layer_id": 7200,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 4476,
+                    "prepared_amount": 448,
+                    "extracted_amount": 0,
+                    "preparable_amount": 4028,
+                    "extractable_amount": 448
+                },
+                {
+                    "planet_id": 1100,
+                    "planet_layer_material_id": 4631,
+                    "planet_layer_id": 7200,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 4431,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 4431,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": []
+        }
+    ],
+    "collectables": {
+        "artwork": {
+            "planet_id": 1100,
+            "planet_collectable_id": 998,
+            "type": "artwork",
+            "name": "Avastus",
+            "item_number": 1,
+            "title": null,
+            "author": "Elias Stern",
+            "pieces": 1,
+            "collectable_image": "avastus-thumbnail.jpg",
+            "total_copies": 1,
+            "copy_number": 1,
+            "collection_id": 9
+        },
+        "music": {
+            "planet_id": 1100,
+            "planet_collectable_id": 999,
+            "type": "music",
+            "name": "Ruula",
+            "item_number": 1,
+            "title": null,
+            "author": "Ewert Sundja",
+            "pieces": 1,
+            "collectable_image": "avastus-thumbnail.jpg",
+            "total_copies": 1,
+            "copy_number": 1,
+            "collection_id": 23
+        },
+        "lore": {
+            "planet_id": 1100,
+            "planet_collectable_id": 1000,
+            "type": "lore",
+            "name": "The Legacy",
+            "item_number": 1,
+            "title": "The Legacy",
+            "author": "Taavi Kusmin",
+            "pieces": 1,
+            "collectable_image": null,
+            "total_copies": 1,
+            "copy_number": 1,
+            "collection_id": 24
+        }
+    },
+    "generation": "GEN-0",
+    "location": {
+        "sector_name": "Diyu",
+        "region_name": "Euler’s Hope"
+    },
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/1200x1200/planets/1543782852.png",
+    "external_link": "https://play.projectnebula.app/planet/1100",
+    "box": {
+        "box_id": 1100,
+        "opened": false
+    },
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "GEN-0"
+        },
+        {
+            "key": "rarity",
+            "value": "mythic"
+        },
+        {
+            "key": "type",
+            "value": "exotic"
+        }
+    ]
+}

@@ -49,6 +49,112 @@
             "updated_at": "2021-09-28 20:22:49.715319"
         }
     ],
+    "deposits": [
+        {
+            "layerNumber": 1,
+            "planet_layer_id": 167,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 7,
+                    "planet_layer_id": 167,
+                    "item_id": 120,
+                    "item_name": "Metamagnetic Ore",
+                    "item_description": "Metamagnetic Ore is refined and crafted into components, modules and other items.",
+                    "image_path": "Metamagnetic_Ore.png",
+                    "material_rarity": "uncommon",
+                    "total_amount": 1080,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 1080,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 570,
+                    "planet_layer_id": 167,
+                    "item_id": 107,
+                    "item_name": "H2O",
+                    "item_description": "H2O is refined and crafted into components, modules and other items.",
+                    "image_path": "H20.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 4951,
+                    "prepared_amount": 4951,
+                    "extracted_amount": 0,
+                    "preparable_amount": 0,
+                    "extractable_amount": 4951
+                },
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 689,
+                    "planet_layer_id": 167,
+                    "item_id": 42,
+                    "item_name": "Base Minerals",
+                    "item_description": "Base Minerals are refined and crafted into components, modules and other items.",
+                    "image_path": "Base_Mineral.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 2883,
+                    "prepared_amount": 1083,
+                    "extracted_amount": 0,
+                    "preparable_amount": 1800,
+                    "extractable_amount": 1083
+                }
+            ],
+            "undiscoveredDeposits": []
+        },
+        {
+            "layerNumber": 2,
+            "planet_layer_id": 6267,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 1185,
+                    "planet_layer_id": 6267,
+                    "item_id": 105,
+                    "item_name": "Silicates",
+                    "item_description": "Silicates are refined and crafted into components, modules and other items.",
+                    "image_path": "Silicates.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 5652,
+                    "prepared_amount": 1698,
+                    "extracted_amount": 0,
+                    "preparable_amount": 3954,
+                    "extractable_amount": 1698
+                },
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 1246,
+                    "planet_layer_id": 6267,
+                    "item_id": 53,
+                    "item_name": "Ignis Ore",
+                    "item_description": "Ignis Ore is refined and crafted into components, modules and other items.",
+                    "image_path": "Ignis_Ore.png",
+                    "material_rarity": "rare",
+                    "total_amount": 806,
+                    "prepared_amount": 324,
+                    "extracted_amount": 0,
+                    "preparable_amount": 482,
+                    "extractable_amount": 324
+                },
+                {
+                    "planet_id": 167,
+                    "planet_layer_material_id": 1299,
+                    "planet_layer_id": 6267,
+                    "item_id": 109,
+                    "item_name": "Titanium",
+                    "item_description": "Titanium is refined and crafted into components, modules and other items.",
+                    "image_path": "Titanium.png",
+                    "material_rarity": "common",
+                    "total_amount": 2611,
+                    "prepared_amount": 2289,
+                    "extracted_amount": 0,
+                    "preparable_amount": 322,
+                    "extractable_amount": 2289
+                }
+            ],
+            "undiscoveredDeposits": []
+        }
+    ],
     "collectables": {
         "artwork": null,
         "music": null,

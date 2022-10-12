@@ -88,6 +88,127 @@
             "updated_at": "2022-04-21 13:10:41.49562"
         }
     ],
+    "deposits": [
+        {
+            "layerNumber": 1,
+            "planet_layer_id": 1172,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 10,
+                    "planet_layer_id": 1172,
+                    "item_id": 127,
+                    "item_name": "Microorganisms",
+                    "item_description": "Microorganisms are refined and crafted into components, modules and other items.",
+                    "image_path": "Microorganism.png",
+                    "material_rarity": "rare",
+                    "total_amount": 681,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 681,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 14,
+                    "planet_layer_id": 1172,
+                    "item_id": 119,
+                    "item_name": "Novis Compounds",
+                    "item_description": "Novis Compounds are refined and crafted into components, modules and other items.",
+                    "image_path": "Novis_Compound.png",
+                    "material_rarity": "uncommon",
+                    "total_amount": 2191,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 2191,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 28,
+                    "planet_layer_id": 1172,
+                    "item_id": 106,
+                    "item_name": "Elastomers",
+                    "item_description": "Elastomers are refined and crafted into components, modules and other items.",
+                    "image_path": "Elastomers.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 4782,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 4782,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": []
+        },
+        {
+            "layerNumber": 2,
+            "planet_layer_id": 7272,
+            "discoveredDeposits": [
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 697,
+                    "planet_layer_id": 7272,
+                    "item_id": 110,
+                    "item_name": "Plutonium",
+                    "item_description": "Plutonium is refined and crafted into components, modules and other items.",
+                    "image_path": "Plutonium.png",
+                    "material_rarity": "common",
+                    "total_amount": 2837,
+                    "prepared_amount": 1420,
+                    "extracted_amount": 0,
+                    "preparable_amount": 1417,
+                    "extractable_amount": 1420
+                },
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 1244,
+                    "planet_layer_id": 7272,
+                    "item_id": 127,
+                    "item_name": "Microorganisms",
+                    "item_description": "Microorganisms are refined and crafted into components, modules and other items.",
+                    "image_path": "Microorganism.png",
+                    "material_rarity": "rare",
+                    "total_amount": 621,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 621,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 1245,
+                    "planet_layer_id": 7272,
+                    "item_id": 127,
+                    "item_name": "Microorganisms",
+                    "item_description": "Microorganisms are refined and crafted into components, modules and other items.",
+                    "image_path": "Microorganism.png",
+                    "material_rarity": "rare",
+                    "total_amount": 671,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 671,
+                    "extractable_amount": 0
+                },
+                {
+                    "planet_id": 1172,
+                    "planet_layer_material_id": 4275,
+                    "planet_layer_id": 7272,
+                    "item_id": 42,
+                    "item_name": "Base Minerals",
+                    "item_description": "Base Minerals are refined and crafted into components, modules and other items.",
+                    "image_path": "Base_Mineral.png",
+                    "material_rarity": "abundant",
+                    "total_amount": 5162,
+                    "prepared_amount": 0,
+                    "extracted_amount": 0,
+                    "preparable_amount": 5162,
+                    "extractable_amount": 0
+                }
+            ],
+            "undiscoveredDeposits": []
+        }
+    ],
     "collectables": {
         "artwork": {
             "planet_id": 1172,
