@@ -389,7 +389,43 @@ def pull_ship_owners():
 
 
 ############################################
+def pull_item_data():
+    totalSupply = 131 # ???
+    item_list = []
+
+    for tokenId in range(1, 6): # range(1, totalSupply + 1):
+        #tokenInfo = requests.get(call(NebulaSpaceshipTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
+        api_url = "https://api.projectnebula.app/item/" + str(tokenId)
+        tokenInfo = requests.get(api_url).json()
+        print(tokenId, ":", tokenInfo["name"])
+        
+        df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
+        item_list.append(df)
+
+    # -----------------------
+    df_items = pd.concat(item_list)
+    df_items.to_csv("./tests/samples/items.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_items,
+        table_name="items",
+        list_of_col_names=[
+            "item_id","type","name","type_color","description","flavor_text","effect","image_path"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+
+############################################
+def pull_item_owners():
+    pass
+    # userTokenBalances (address, offset=0) - loop through unique list of wallets based on planet and ship owners
+
+
+############################################
 #pull_planet_data()
 #pull_planet_owners()
 #pull_ship_data()
-pull_ship_owners()
+#pull_ship_owners()
+pull_item_data()

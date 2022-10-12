@@ -1,0 +1,10 @@
+{
+    "item_id": 131,
+    "name": "Ship Slot #4",
+    "description": "This item unlocks Ship Slot #4 on your Project Nebula account, allowing you to deploy an additional ship.",
+    "type": "utility",
+    "type_color": "white",
+    "image_path": "Utility_1.png",
+    "flavor_text": "Fleets are built one ship at a time.",
+    "effect": "UNLOCK_SHIP_SLOT_4"
+}

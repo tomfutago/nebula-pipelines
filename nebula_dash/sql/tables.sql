@@ -12,6 +12,7 @@ drop table if exists planet_owners;
 drop table if exists ships;
 drop table if exists ship_abilities;
 drop table if exists ship_owners;
+drop table if exists items;
 */
 
 create table if not exists planets (
@@ -163,6 +164,19 @@ create table if not exists ship_owners (
     updated_at timestamp null
 );
 
+create table if not exists items (
+    item_id integer not null constraint pk_items primary key,
+    type varchar(50) not null,
+    name varchar(100) not null,
+    type_color varchar(30) null,
+    description varchar(500) not null,
+    flavor_text varchar(500) not null,
+    effect varchar(100) null,
+    image_path varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
 /*
 select * from planets;
 select * from planet_upgrades;
@@ -175,4 +189,5 @@ select * from planet_owners;
 select * from ships;
 select * from ship_abilities;
 select * from ship_owners;
+select * from items;
 */
