@@ -1,0 +1,46 @@
+{
+    "id": 1297,
+    "name": "Undiscovered Planet",
+    "type": "unknown",
+    "rarity": "unknown",
+    "imagePath": "unknown-planet.png",
+    "description": "This planet lies hidden in the void, full of resources and perhaps other valuable secrets waiting to be uncovered by its first colonizer. Grab a spaceship and get out there, explorer!",
+    "credits": 0,
+    "industry": 0,
+    "research": 0,
+    "surface": "unknown",
+    "atmosphere": "unknown",
+    "moons": 0,
+    "temperature": 0,
+    "radius": 0,
+    "mass": "unknown",
+    "gravity": "unknown",
+    "specials": [],
+    "upgrades": [],
+    "collectables": {
+        "artwork": null,
+        "music": null,
+        "lore": null
+    },
+    "location": null,
+    "token_type": "planet",
+    "box": null,
+    "public": false,
+    "generation": "unknown",
+    "image": "https://d2r1p2wt01zdse.cloudfront.net/1200x1200/planets/unknown-planet.png",
+    "external_link": "https://play.projectnebula.app/planet/1297",
+    "attributes": [
+        {
+            "key": "generation",
+            "value": "unknown"
+        },
+        {
+            "key": "rarity",
+            "value": "unknown"
+        },
+        {
+            "key": "type",
+            "value": "unknown"
+        }
+    ]
+}
