@@ -1,0 +1,49 @@
+{
+    "icx_getTransactionByHash": {
+      "blockHash": "0xe3483fed08c982033ec165d279a94a8ac6658d619f45938917ced2fd6138b74c",
+      "blockHeight": "0x35ef174",
+      "data": {
+        "method": "transfer",
+        "params": {
+          "_to": "hxaee7d004403fbf6cb046153579e99bf66265c2d1",
+          "_tokenId": "0x9b8"
+        }
+      },
+      "dataType": "call",
+      "from": "hxd79678f6b08495a7c63333e37c8a4ac1cdffa41e",
+      "nid": "0x1",
+      "nonce": "0x1",
+      "signature": "wieWvnYwZ9a1xM1XiKzRGv2gJKQ8I3GD1RVbxSP8EAU4TnUNSBKmwDR0OBlKo8CJt4aQfJ7rqa7a9hIkzvJ/UwA=",
+      "stepLimit": "0x42c1d80",
+      "timestamp": "0x5eae650113d30",
+      "to": "cx57d7acf8b5114b787ecdd99ca460c2272e4d9135",
+      "txHash": "0x98c3c8dc1f11285e86527ac4b93de643645dd7aa6af4f803c3d30572959caeaa",
+      "txIndex": "0x1",
+      "value": "0x0",
+      "version": "0x3"
+    },
+    "icx_getTransactionResult": {
+      "blockHash": "0xe3483fed08c982033ec165d279a94a8ac6658d619f45938917ced2fd6138b74c",
+      "blockHeight": "0x35ef174",
+      "cumulativeStepUsed": "0xa896d",
+      "eventLogs": [
+        {
+          "scoreAddress": "cx57d7acf8b5114b787ecdd99ca460c2272e4d9135",
+          "indexed": [
+            "Transfer(Address,Address,int)",
+            "hxd79678f6b08495a7c63333e37c8a4ac1cdffa41e",
+            "hxaee7d004403fbf6cb046153579e99bf66265c2d1",
+            "0x9b8"
+          ],
+          "data": []
+        }
+      ],
+      "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000008000000000000000000000000000000000008000000000000000000000000000000000000000000000200000000000000200000000000400000000000000000000000000000000000000000000000800020000000000000000000000000000000000200000000020000000000080000000000000000010000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000010000000000000000000000000020000000000000000000000",
+      "status": "0x1",
+      "stepPrice": "0x2e90edd00",
+      "stepUsed": "0xa896d",
+      "to": "cx57d7acf8b5114b787ecdd99ca460c2272e4d9135",
+      "txHash": "0x98c3c8dc1f11285e86527ac4b93de643645dd7aa6af4f803c3d30572959caeaa",
+      "txIndex": "0x1"
+    }
+  }

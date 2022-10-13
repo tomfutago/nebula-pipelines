@@ -1,6 +1,7 @@
 import os
 import requests
 import pandas as pd
+import itertools as it
 import sqlalchemy as db
 from dotenv import load_dotenv
 from typing import Optional, Dict, List
@@ -19,6 +20,13 @@ db_engine = db.create_engine(db_string)
 # Project Nebula contracts
 NebulaPlanetTokenCx = "cx57d7acf8b5114b787ecdd99ca460c2272e4d9135"
 NebulaSpaceshipTokenCx = "cx943cf4a4e4e281d82b15ae0564bbdcbf8114b3ec"
+NebulaTokenClaimingCx = "cx4bfc45b11cf276bb58b3669076d99bc6b3e4e3b8"
+NebulaMultiTokenCx = "cx85954d0dae92b63bf5cba03a59ca4ffe687bad0a"
+# additional wallets
+NebulaNonCreditClaim = "hx888ed0ff5ebc119e586b5f3d4a0ef20eaa0ed123"
+NebulaMultiTokenTreasurer = "hx82ea662ea6e8484068f0d3c57ebab570cf6ce478"
+NebulaMultiTokenMinter = "hxfa1d8823122048bdd171687330d0d52e0c7b3e6b"
+
 
 # connect to ICON main-net
 icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
@@ -425,13 +433,18 @@ def pull_ship_owners():
 
 ############################################
 def pull_item_data():
-    totalSupply = 131 # ???
+    # totalSupply : 1-131 + 10001-10144
     item_list = []
 
-    for tokenId in range(1, 6): # range(1, totalSupply + 1):
+    for tokenId in it.chain(range(1, 131 + 1), range(10001, 10144 + 1)):
         #tokenInfo = requests.get(call(NebulaSpaceshipTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
         api_url = "https://api.projectnebula.app/item/" + str(tokenId)
-        tokenInfo = requests.get(api_url).json()
+
+        try:
+            tokenInfo = requests.get(api_url).json()
+        except:
+            continue
+        
         print(tokenId, ":", tokenInfo["name"])
         
         df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
@@ -458,9 +471,55 @@ def pull_item_owners():
     # userTokenBalances (address, offset=0) - loop through unique list of wallets based on planet and ship owners
 
 
+
+############################################
+def pull_nebula_txns():
+    # latest block height
+    #block_height = icon_service.get_block("latest")["height"]
+
+    blocks = [56553844,56561982,56560250,56552835] # [transfer,delist_token,purchase_token,list_token]
+    tx_list = []
+    tx_result_list = []
+
+    #block_height = 56553844 # transfer
+
+    for block_height in blocks:
+        block = icon_service.get_block(block_height)
+
+        for tx in block["confirmed_transaction_list"]:
+            if "to" in tx:
+                if tx["to"] == NebulaPlanetTokenCx or tx["to"] == NebulaSpaceshipTokenCx \
+                    or tx["to"] == NebulaTokenClaimingCx or tx["to"] == NebulaMultiTokenCx:
+
+                    # check if tx was successful - if not skip and move on
+                    txResult = icon_service.get_transaction_result(tx["txHash"])
+                    # status : 1 on success, 0 on failure
+                    if txResult["status"] == 0:
+                        continue
+
+                    df_tx = pd.json_normalize(tx, sep="_")
+                    df_tx["block_height"] = block_height
+                    tx_list.append(df_tx)
+
+                    df_tx_results = pd.json_normalize(
+                        txResult,
+                        record_path=["eventLogs"],
+                        meta=["blockHeight", "status", "to", "txHash", "txIndex"],
+                        sep="_"
+                    )
+                    tx_result_list.append(df_tx_results)
+
+    df_txns = pd.concat(tx_list)
+    df_txns.to_csv("./tests/samples/txns.csv", index=False)
+
+    df_tx_events = pd.concat(tx_result_list)
+    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+
+
 ############################################
 #pull_planet_data()
 #pull_planet_owners()
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
+pull_nebula_txns()

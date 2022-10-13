@@ -1,0 +1,45 @@
+{
+    "block_hash": "e3483fed08c982033ec165d279a94a8ac6658d619f45938917ced2fd6138b74c",
+    "confirmed_transaction_list": [
+      {
+        "data": {
+          "result": {
+            "coveredByFee": "0x0",
+            "coveredByOverIssuedICX": "0x0",
+            "issue": "0x201fdfcf45d9425f"
+          }
+        },
+        "dataType": "base",
+        "timestamp": "0x5eae650629432",
+        "txHash": "0xbeb82e4a724365c0734222bc4336d6ab5796f7da0fb5313250f5e745257e7cf0",
+        "version": "0x3"
+      },
+      {
+        "data": {
+          "method": "transfer",
+          "params": {
+            "_to": "hxaee7d004403fbf6cb046153579e99bf66265c2d1",
+            "_tokenId": "0x9b8"
+          }
+        },
+        "dataType": "call",
+        "from": "hxd79678f6b08495a7c63333e37c8a4ac1cdffa41e",
+        "nid": "0x1",
+        "nonce": "0x1",
+        "signature": "wieWvnYwZ9a1xM1XiKzRGv2gJKQ8I3GD1RVbxSP8EAU4TnUNSBKmwDR0OBlKo8CJt4aQfJ7rqa7a9hIkzvJ/UwA=",
+        "stepLimit": "0x42c1d80",
+        "timestamp": "0x5eae650113d30",
+        "to": "cx57d7acf8b5114b787ecdd99ca460c2272e4d9135",
+        "txHash": "0x98c3c8dc1f11285e86527ac4b93de643645dd7aa6af4f803c3d30572959caeaa",
+        "value": "0x0",
+        "version": "0x3"
+      }
+    ],
+    "height": 56553844,
+    "merkle_tree_root_hash": "0dab6d736e3c6db6d141416f3cf402c1b6dfcabaddcc67b08be2ef2c91dad62a",
+    "peer_id": "hx9244a8d9638a8a32ac27f665c52ccd7ff6517e57",
+    "prev_block_hash": "25e9ab4c9ca7706c27b0fb4655f3541fe16b90fa0ff0e6aab4bbc1c427069d67",
+    "signature": "",
+    "time_stamp": 1665649795568690,
+    "version": "2.0"
+  }
