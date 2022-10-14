@@ -14,6 +14,7 @@ drop table if exists ship_abilities;
 drop table if exists ship_owners;
 drop table if exists items;
 drop table if exists trxn;
+drop table if exists trxn_data;
 */
 
 create table if not exists planets (
@@ -179,22 +180,38 @@ create table if not exists items (
 );
 
 create table if not exists trxn (
-    trxn_id bigint not null constraint pk_trxn primary key,
+    tx_hash varchar(200) not null constraint pk_trxn primary key,
     block_height bigint not null,
     timestamp bigint not null,
     from_address varchar(50) not null,
     to_address varchar(50) not null,
-    txHash varchar(200) not null,
-    value bigint not null,
+    value numeric(50,0) not null,
     data_method varchar(100) not null,
-    data_params varchar(1000) not null,
+    data_params varchar(1000) null,
     data_type varchar(50) not null,
     nid integer not null,
     nonce smallint not null,
-    stepLimit bigint not null,
+    step_limit bigint not null,
     signature varchar(200) not null,
     version smallint not null,
     created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
+create table if not exists trxn_data (
+    tx_hash varchar(200) not null constraint pk_trxn_data primary key,
+    block_height bigint not null,
+    method varchar(100) not null,
+    token_id integer null,
+    params__to varchar(50) null,
+    params__token_id varchar(50) null,
+    params__token_id_2 varchar(50) null,
+    params__order_id varchar(50) null,
+    params__amount varchar(50) null,
+    params__price varchar(50) null,
+    params__starting_price varchar(50) null,
+    params__duration_in_hours varchar(50) null,
+	created_at timestamp not null default current_timestamp,
     updated_at timestamp null
 );
 
@@ -212,4 +229,5 @@ select * from ship_abilities;
 select * from ship_owners;
 select * from items;
 select * from trxn;
+select * from trxn_data;
 */
