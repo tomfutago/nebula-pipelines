@@ -1,5 +1,6 @@
 import os
 import requests
+import numpy as np
 import pandas as pd
 import itertools as it
 import sqlalchemy as db
@@ -26,17 +27,17 @@ NebulaMultiTokenCx = "cx85954d0dae92b63bf5cba03a59ca4ffe687bad0a"
 NebulaNonCreditClaim = "hx888ed0ff5ebc119e586b5f3d4a0ef20eaa0ed123"
 NebulaMultiTokenTreasurer = "hx82ea662ea6e8484068f0d3c57ebab570cf6ce478"
 NebulaMultiTokenMinter = "hxfa1d8823122048bdd171687330d0d52e0c7b3e6b"
-
+# .. and all of them combined:
+NebulaCxHxList = [
+    NebulaPlanetTokenCx, NebulaSpaceshipTokenCx, NebulaTokenClaimingCx, NebulaMultiTokenCx,
+    NebulaNonCreditClaim, NebulaMultiTokenTreasurer, NebulaMultiTokenMinter
+]
 
 # connect to ICON main-net
 icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
 
 
-def call(to, method, params):
-    call = CallBuilder().to(to).method(method).params(params).build()
-    result = icon_service.call(call)
-    return result
-
+# helper functions
 def hex_to_int(hex) -> int:
     if hex[:2] == "0x":
         return int(hex, 16)
@@ -53,6 +54,12 @@ def int_to_roman(number: int) -> str:
         if number == 0:
             break
     return "".join(result)
+
+# icon service call
+def call(to, method, params):
+    call = CallBuilder().to(to).method(method).params(params).build()
+    result = icon_service.call(call)
+    return result
 
 # source: https://blog.alexparunov.com/upserting-update-and-insert-with-pandas
 def create_upsert_method(meta: db.MetaData, extra_update_fields: Optional[Dict[str, str]]):
@@ -479,6 +486,7 @@ def pull_nebula_txns():
 
     blocks = [56553844,56561982,56560250,56552835] # [transfer,delist_token,purchase_token,list_token]
     tx_list = []
+    tx_data_list = []
     tx_result_list = []
 
     #block_height = 56553844 # transfer
@@ -488,18 +496,29 @@ def pull_nebula_txns():
 
         for tx in block["confirmed_transaction_list"]:
             if "to" in tx:
-                if tx["to"] == NebulaPlanetTokenCx or tx["to"] == NebulaSpaceshipTokenCx \
-                    or tx["to"] == NebulaTokenClaimingCx or tx["to"] == NebulaMultiTokenCx:
-
+                if tx["to"] in NebulaCxHxList or tx["from"] in NebulaCxHxList:
                     # check if tx was successful - if not skip and move on
                     txResult = icon_service.get_transaction_result(tx["txHash"])
                     # status : 1 on success, 0 on failure
                     if txResult["status"] == 0:
                         continue
 
-                    df_tx = pd.json_normalize(tx, sep="_")
+                    df_tx = pd.json_normalize(tx, max_level=1, sep="_")
                     df_tx["block_height"] = block_height
+                    #df_tx["data_params"] = pd.Series(df_tx["data_params"].to_list()) # upsert function won't allow dict values
                     tx_list.append(df_tx)
+
+                    df_tx_data = pd.json_normalize(tx["data"], sep="_")
+                    df_tx_data = df_tx_data.reindex(columns=[
+                        "block_height", "txHash", "method", "tokenId",
+                        "params__to", "params__tokenId", "params__token_id", 
+                        "params__orderId", "params__amount", "params__price",
+                        "params__starting_price", "params__duration_in_hours"
+                    ])
+                    df_tx_data["block_height"] = block_height
+                    df_tx_data["txHash"] = df_tx["txHash"]
+                    df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
+                    tx_data_list.append(df_tx_data)
 
                     df_tx_results = pd.json_normalize(
                         txResult,
@@ -509,11 +528,50 @@ def pull_nebula_txns():
                     )
                     tx_result_list.append(df_tx_results)
 
-    df_txns = pd.concat(tx_list)
-    df_txns.to_csv("./tests/samples/txns.csv", index=False)
+                    # -----------------------
+                    df_txns = pd.concat(tx_list)
+                    df_txns.to_csv("./tests/samples/txns.csv", index=False)
 
-    df_tx_events = pd.concat(tx_result_list)
-    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+                    # prep and upsert data
+                    data_transform_and_load(
+                        df_to_load=df_tx,
+                        table_name="trxn",
+                        list_of_col_names=[
+                            "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
+                            "data_type","nid","nonce","step_limit","signature","version" #,"data_params"
+                        ],
+                        rename_mapper={
+                            "from": "from_address",
+                            "to": "to_address",
+                            "txHash": "tx_hash",
+                            "dataType": "data_type",
+                            "stepLimit": "step_limit"
+                        },
+                        extra_update_fields={"updated_at": "NOW()"}
+                    )
+                    
+                    df_tx_data = pd.concat(tx_data_list)
+                    df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+
+                    # prep and upsert data
+                    data_transform_and_load(
+                        df_to_load=df_tx_data,
+                        table_name="trxn_data",
+                        list_of_col_names=[
+                            "tx_hash","block_height","method","token_id","params__to","params__token_id","params__token_id_2",
+                            "params__order_id","params__amount","params__price","params__starting_price","params__duration_in_hours"
+                        ],
+                        rename_mapper={
+                            "txHash": "tx_hash",
+                            "tokenId": "token_id",
+                            "params__tokenId": "params__token_id_2",
+                            "params__orderId": "params__order_id"
+                        },
+                        extra_update_fields={"updated_at": "NOW()"}
+                    )
+
+                    df_tx_events = pd.concat(tx_result_list)
+                    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
 
 
 ############################################

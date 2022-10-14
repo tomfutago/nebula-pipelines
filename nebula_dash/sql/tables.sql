@@ -13,6 +13,7 @@ drop table if exists ships;
 drop table if exists ship_abilities;
 drop table if exists ship_owners;
 drop table if exists items;
+drop table if exists trxn;
 */
 
 create table if not exists planets (
@@ -177,6 +178,26 @@ create table if not exists items (
     updated_at timestamp null
 );
 
+create table if not exists trxn (
+    trxn_id bigint not null constraint pk_trxn primary key,
+    block_height bigint not null,
+    timestamp bigint not null,
+    from_address varchar(50) not null,
+    to_address varchar(50) not null,
+    txHash varchar(200) not null,
+    value bigint not null,
+    data_method varchar(100) not null,
+    data_params varchar(1000) not null,
+    data_type varchar(50) not null,
+    nid integer not null,
+    nonce smallint not null,
+    stepLimit bigint not null,
+    signature varchar(200) not null,
+    version smallint not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
 /*
 select * from planets;
 select * from planet_upgrades;
@@ -190,4 +211,5 @@ select * from ships;
 select * from ship_abilities;
 select * from ship_owners;
 select * from items;
+select * from trxn;
 */
