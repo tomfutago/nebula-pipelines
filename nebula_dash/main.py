@@ -45,6 +45,12 @@ def hex_to_int(hex) -> int:
     except:
         return None
 
+def dict_to_str(d):
+    try:
+        return "[" + str(d) + "]"
+    except:
+        return None
+
 def int_to_roman(number: int) -> str:
     num_map = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),
                (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]
@@ -491,10 +497,10 @@ def pull_nebula_txns():
     """
 
     #block_height = 25353586 # first mint
-    block_height = 25355305 # last stop
+    block_height = 25740280 # last stop
     
-    #while True:
-    while block_height < 25355305 + 10000:
+    while True:
+    #while block_height < 25740280 + 3:  #< 25365304 + 10000:
         try:
             block = icon_service.get_block(block_height)
             print("block:", block_height)
@@ -520,7 +526,7 @@ def pull_nebula_txns():
                             df_tx = pd.json_normalize(tx, max_level=1, sep="_")
                             df_tx["block_height"] = block_height
                             df_tx["idx"] = block_height * 100000000 + df_tx.index + 1 # generated PK
-                            #df_tx["data_params"] = pd.Series(df_tx["data_params"].to_list()) # upsert function won't allow dict values
+                            df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
                             tx_list.append(df_tx)
 
                             # -----------------------
@@ -566,7 +572,7 @@ def pull_nebula_txns():
                                 table_name="trxn",
                                 list_of_col_names=[
                                     "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
-                                    "data_type","nid","nonce","step_limit","signature","version" #,"data_params"
+                                    "data_type","nid","nonce","step_limit","signature","version","data_params"
                                 ],
                                 rename_mapper={
                                     "idx": "tx_id",
