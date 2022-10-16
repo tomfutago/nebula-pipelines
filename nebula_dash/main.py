@@ -497,7 +497,7 @@ def pull_nebula_txns():
     """
 
     #block_height = 25353586 # first mint
-    block_height = 25740280 # last stop
+    block_height = 25827900 # last stop
     
     while True:
     #while block_height < 25740280 + 3:  #< 25365304 + 10000:
