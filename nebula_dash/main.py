@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import itertools as it
 import sqlalchemy as db
+from time import sleep
 from dotenv import load_dotenv
 from typing import Optional, Dict, List
 from iconsdk.icon_service import IconService
@@ -27,11 +28,8 @@ NebulaMultiTokenCx = "cx85954d0dae92b63bf5cba03a59ca4ffe687bad0a"
 NebulaNonCreditClaim = "hx888ed0ff5ebc119e586b5f3d4a0ef20eaa0ed123"
 NebulaMultiTokenTreasurer = "hx82ea662ea6e8484068f0d3c57ebab570cf6ce478"
 NebulaMultiTokenMinter = "hxfa1d8823122048bdd171687330d0d52e0c7b3e6b"
-# .. and all of them combined:
-NebulaCxHxList = [
-    NebulaPlanetTokenCx, NebulaSpaceshipTokenCx, NebulaTokenClaimingCx, NebulaMultiTokenCx,
-    NebulaNonCreditClaim, NebulaMultiTokenTreasurer, NebulaMultiTokenMinter
-]
+# contracts combined:
+NebulaCxList = [NebulaPlanetTokenCx, NebulaSpaceshipTokenCx, NebulaTokenClaimingCx, NebulaMultiTokenCx]
 
 # connect to ICON main-net
 icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
@@ -39,10 +37,13 @@ icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
 
 # helper functions
 def hex_to_int(hex) -> int:
-    if hex[:2] == "0x":
-        return int(hex, 16)
-    else:
-        return int(hex)
+    try:
+        if hex[:2] == "0x":
+            return int(hex, 16)
+        else:
+            return int(hex)
+    except:
+        return None
 
 def int_to_roman(number: int) -> str:
     num_map = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),
@@ -137,7 +138,8 @@ def data_transform_and_load(
 ############################################
 def pull_planet_data():
     # retrieve total supply of tokens and convert hex result to int
-    totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
+    #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
+    totalSupply = 7000 # temp setting as total doesnt match result from the call ^
     planet_list = []
     planet_upgrade_list = []
     planet_specials_list = []
@@ -157,36 +159,33 @@ def pull_planet_data():
 
         print(tokenId, ":", tokenInfo["name"])
         
-        df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
-        planet_list.append(df)
-
-        if tokenInfo["name"] == "Undiscovered Planet":
-            continue
-
-        dfu = pd.json_normalize(tokenInfo, record_path=["upgrades"], meta=["id"])
-        dfs = pd.json_normalize(tokenInfo, record_path=["specials"], meta=["id"])
-        dfp = pd.json_normalize(tokenInfo, record_path=["deposits"], meta=["id"])
-        dfpd = pd.json_normalize(tokenInfo["deposits"], record_path=["discoveredDeposits"])
-        dfpu = pd.json_normalize(tokenInfo["deposits"], record_path=["undiscoveredDeposits"], meta=["planet_layer_id"])
-        
-        planet_upgrade_list.append(dfu)
-        planet_specials_list.append(dfs)
-        planet_deposit_list.append(dfp)
-        planet_deposit_discovered_list.append(dfpd)
-        planet_deposit_undiscovered_list.append(dfpu)
-        
-        # collectibles (odd one)
-        dfc = pd.json_normalize(df["collectables_artwork"].to_list())
-        if not dfc.empty:
-            planet_collectibles_list.append(dfc)
-        
-        dfc = pd.json_normalize(df["collectables_music"].to_list())
-        if not dfc.empty:
-            planet_collectibles_list.append(dfc)
-        
-        dfc = pd.json_normalize(df["collectables_lore"].to_list())
-        if not dfc.empty:
-            planet_collectibles_list.append(dfc)
+        if tokenInfo["name"] != "Undiscovered Planet":
+            df = pd.json_normalize(tokenInfo, max_level=1, sep="_")
+            dfu = pd.json_normalize(tokenInfo, record_path=["upgrades"], meta=["id"])
+            dfs = pd.json_normalize(tokenInfo, record_path=["specials"], meta=["id"])
+            dfp = pd.json_normalize(tokenInfo, record_path=["deposits"], meta=["id"])
+            dfpd = pd.json_normalize(tokenInfo["deposits"], record_path=["discoveredDeposits"])
+            dfpu = pd.json_normalize(tokenInfo["deposits"], record_path=["undiscoveredDeposits"], meta=["planet_layer_id"])
+            
+            planet_list.append(df)
+            planet_upgrade_list.append(dfu)
+            planet_specials_list.append(dfs)
+            planet_deposit_list.append(dfp)
+            planet_deposit_discovered_list.append(dfpd)
+            planet_deposit_undiscovered_list.append(dfpu)
+            
+            # collectibles (odd one)
+            dfc = pd.json_normalize(df["collectables_artwork"].to_list())
+            if not dfc.empty:
+                planet_collectibles_list.append(dfc)
+            
+            dfc = pd.json_normalize(df["collectables_music"].to_list())
+            if not dfc.empty:
+                planet_collectibles_list.append(dfc)
+            
+            dfc = pd.json_normalize(df["collectables_lore"].to_list())
+            if not dfc.empty:
+                planet_collectibles_list.append(dfc)
         
         # write to db in batches per 1000 records
         if tokenId % 1000 == 0 or tokenId == totalSupply:
@@ -319,19 +318,20 @@ def pull_planet_data():
 ############################################
 def pull_planet_owners():
     # retrieve total supply of tokens and convert hex result to int
-    totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
+    #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
+    totalSupply = 7000 # replace with sqlalchemy view listing all pulled tokenIDs
     # retrieve current owners
     planet_owner_list = []
 
-    for tokenId in range(1001, totalSupply + 1):
+    for tokenId in range(1, totalSupply + 1):
         try:
             owner = call(NebulaPlanetTokenCx, "ownerOf", {"_tokenId": tokenId})
+
+            print(tokenId, ":", owner)
+            planet_owner_list.append([tokenId, owner])
         except:
             # likely reason: >> SCOREError(-30032): E0032:Invalid _tokenId. NFT is burned
-            continue
-
-        print(tokenId, ":", owner)
-        planet_owner_list.append([tokenId, owner])
+            pass
 
         # write to db in batches per 1000 records
         if tokenId % 1000 == 0 or tokenId == totalSupply:
@@ -478,100 +478,158 @@ def pull_item_owners():
     # userTokenBalances (address, offset=0) - loop through unique list of wallets based on planet and ship owners
 
 
-
 ############################################
 def pull_nebula_txns():
     # latest block height
     #block_height = icon_service.get_block("latest")["height"]
 
+    """
+    # just test:
     blocks = [56553844,56561982,56560250,56552835] # [transfer,delist_token,purchase_token,list_token]
-    tx_list = []
-    tx_data_list = []
-    tx_result_list = []
-
     #block_height = 56553844 # transfer
-
     for block_height in blocks:
-        block = icon_service.get_block(block_height)
+    """
 
-        for tx in block["confirmed_transaction_list"]:
-            if "to" in tx:
-                if tx["to"] in NebulaCxHxList or tx["from"] in NebulaCxHxList:
-                    # check if tx was successful - if not skip and move on
-                    txResult = icon_service.get_transaction_result(tx["txHash"])
-                    # status : 1 on success, 0 on failure
-                    if txResult["status"] == 0:
-                        continue
+    #block_height = 25353586 # first mint
+    block_height = 25355305 # last stop
+    
+    #while True:
+    while block_height < 25355305 + 10000:
+        try:
+            block = icon_service.get_block(block_height)
+            print("block:", block_height)
+        except:
+            sleep(2)
+            continue
+        else:
+            #try:
+                tx_list = []
+                tx_data_list = []
+                tx_event_list = []
 
-                    df_tx = pd.json_normalize(tx, max_level=1, sep="_")
-                    df_tx["block_height"] = block_height
-                    #df_tx["data_params"] = pd.Series(df_tx["data_params"].to_list()) # upsert function won't allow dict values
-                    tx_list.append(df_tx)
+                for tx in block["confirmed_transaction_list"]:
+                    if "to" in tx:
+                        if tx["to"] in NebulaCxList or tx["from"] in NebulaCxList:
+                            # check if tx was successful - if not skip and move on
+                            txResult = icon_service.get_transaction_result(tx["txHash"])
+                            # status : 1 on success, 0 on failure
+                            if txResult["status"] == 0:
+                                continue
 
-                    df_tx_data = pd.json_normalize(tx["data"], sep="_")
-                    df_tx_data = df_tx_data.reindex(columns=[
-                        "block_height", "txHash", "method", "tokenId",
-                        "params__to", "params__tokenId", "params__token_id", 
-                        "params__orderId", "params__amount", "params__price",
-                        "params__starting_price", "params__duration_in_hours"
-                    ])
-                    df_tx_data["block_height"] = block_height
-                    df_tx_data["txHash"] = df_tx["txHash"]
-                    df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
-                    tx_data_list.append(df_tx_data)
+                            # -----------------------
+                            df_tx = pd.json_normalize(tx, max_level=1, sep="_")
+                            df_tx["block_height"] = block_height
+                            df_tx["idx"] = block_height * 100000000 + df_tx.index + 1 # generated PK
+                            #df_tx["data_params"] = pd.Series(df_tx["data_params"].to_list()) # upsert function won't allow dict values
+                            tx_list.append(df_tx)
 
-                    df_tx_results = pd.json_normalize(
-                        txResult,
-                        record_path=["eventLogs"],
-                        meta=["blockHeight", "status", "to", "txHash", "txIndex"],
-                        sep="_"
-                    )
-                    tx_result_list.append(df_tx_results)
+                            # -----------------------
+                            df_tx_data = pd.json_normalize(tx["data"], sep="_")
+                            # expected column list:
+                            tx_data_columns=[
+                                "block_height", "txHash", "method", "tokenId",
+                                "params__to", "params__tokenId", "params__token_id", 
+                                "params__orderId", "params__amount", "params__price",
+                                "params__starting_price", "params__duration_in_hours",
+                                "params__address", "params__token_URI", "params_txHash"
+                            ]
+                            # add missing columns:
+                            df_tx_data_cols = df_tx_data.columns.to_list()
+                            for c in tx_data_columns:
+                                if c not in df_tx_data_cols:
+                                    df_tx_data[c] = None
+                            
+                            df_tx_data["block_height"] = block_height
+                            df_tx_data["idx"] = block_height * 100000000 + df_tx_data.index + 1 # generated PK
+                            df_tx_data["txHash"] = df_tx["txHash"]
+                            df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
+                            df_tx_data["tokenId"] = df_tx_data["tokenId"].apply(hex_to_int)
+                            tx_data_list.append(df_tx_data)
 
-                    # -----------------------
-                    df_txns = pd.concat(tx_list)
-                    df_txns.to_csv("./tests/samples/txns.csv", index=False)
+                            # -----------------------
+                            df_tx_events = pd.json_normalize(
+                                txResult,
+                                record_path=["eventLogs"],
+                                meta=["blockHeight", "status", "to", "txHash", "txIndex"],
+                                sep="_"
+                            )
+                            df_tx_events["idx"] = block_height * 100000000 + df_tx_events.index + 1 # generated PK
+                            tx_event_list.append(df_tx_events)
 
-                    # prep and upsert data
-                    data_transform_and_load(
-                        df_to_load=df_tx,
-                        table_name="trxn",
-                        list_of_col_names=[
-                            "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
-                            "data_type","nid","nonce","step_limit","signature","version" #,"data_params"
-                        ],
-                        rename_mapper={
-                            "from": "from_address",
-                            "to": "to_address",
-                            "txHash": "tx_hash",
-                            "dataType": "data_type",
-                            "stepLimit": "step_limit"
-                        },
-                        extra_update_fields={"updated_at": "NOW()"}
-                    )
-                    
-                    df_tx_data = pd.concat(tx_data_list)
-                    df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+                            # -----------------------
+                            df_txns = pd.concat(tx_list)
+                            df_txns.to_csv("./tests/samples/txns.csv", index=False)
 
-                    # prep and upsert data
-                    data_transform_and_load(
-                        df_to_load=df_tx_data,
-                        table_name="trxn_data",
-                        list_of_col_names=[
-                            "tx_hash","block_height","method","token_id","params__to","params__token_id","params__token_id_2",
-                            "params__order_id","params__amount","params__price","params__starting_price","params__duration_in_hours"
-                        ],
-                        rename_mapper={
-                            "txHash": "tx_hash",
-                            "tokenId": "token_id",
-                            "params__tokenId": "params__token_id_2",
-                            "params__orderId": "params__order_id"
-                        },
-                        extra_update_fields={"updated_at": "NOW()"}
-                    )
+                            # prep and upsert data
+                            data_transform_and_load(
+                                df_to_load=df_tx,
+                                table_name="trxn",
+                                list_of_col_names=[
+                                    "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
+                                    "data_type","nid","nonce","step_limit","signature","version" #,"data_params"
+                                ],
+                                rename_mapper={
+                                    "idx": "tx_id",
+                                    "from": "from_address",
+                                    "to": "to_address",
+                                    "txHash": "tx_hash",
+                                    "dataType": "data_type",
+                                    "stepLimit": "step_limit"
+                                },
+                                extra_update_fields={"updated_at": "NOW()"}
+                            )
+                            
+                            # -----------------------
+                            df_tx_data = pd.concat(tx_data_list)
+                            df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
 
-                    df_tx_events = pd.concat(tx_result_list)
-                    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+                            # prep and upsert data
+                            data_transform_and_load(
+                                df_to_load=df_tx_data,
+                                table_name="trxn_data",
+                                list_of_col_names=[
+                                    "tx_data_id", "tx_hash","block_height","method","token_id","params__to","params__token_id","params__token_id_2",
+                                    "params__order_id","params__amount","params__price","params__starting_price","params__duration_in_hours",
+                                    "params__address", "params__token_uri", "params_tx_hash"
+                                ],
+                                rename_mapper={
+                                    "idx": "tx_data_id",
+                                    "txHash": "tx_hash",
+                                    "tokenId": "token_id",
+                                    "params__tokenId": "params__token_id_2",
+                                    "params__orderId": "params__order_id",
+                                    "params__token_URI": "params__token_uri",
+                                    "params_txHash": "params_tx_hash"
+                                },
+                                extra_update_fields={"updated_at": "NOW()"}
+                            )
+
+                            # -----------------------
+                            df_tx_events = pd.concat(tx_event_list)
+                            df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+
+                            # prep and upsert data
+                            data_transform_and_load(
+                                df_to_load=df_tx_events,
+                                table_name="trxn_events",
+                                list_of_col_names=[
+                                    "tx_event_id","block_height","status","to_address","score_address",
+                                    "indexed","data","tx_hash","tx_index"
+                                ],
+                                rename_mapper={
+                                    "idx": "tx_event_id",
+                                    "blockHeight": "block_height",
+                                    "to": "to_address",
+                                    "scoreAddress": "score_address",
+                                    "txHash": "tx_hash",
+                                    "txIndex": "tx_index"
+                                },
+                                extra_update_fields={"updated_at": "NOW()"}
+                            )
+                block_height += 1
+            #except:
+            #    sleep(2)
+            #    continue
 
 
 ############################################

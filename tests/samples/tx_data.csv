@@ -1,5 +1,2 @@
-block_height,txHash,method,tokenId,params__to,params__tokenId,params__token_id,params__orderId,params__amount,params__price,params__starting_price,params__duration_in_hours
-56553844,0x98c3c8dc1f11285e86527ac4b93de643645dd7aa6af4f803c3d30572959caeaa,transfer,0x9b8,hxaee7d004403fbf6cb046153579e99bf66265c2d1,0x9b8,,,,,,
-56561982,0xe41bf302a3045606fa5bcd60c7c2b6c2008cbf4a643d4a4b5d421ecfcb89d295,delist_token,0x793,,,0x793,,,,,
-56560250,0xfd367cb25330629efcf201e81b3c1156e82fc8535c1a487105518df75b6accc9,purchase_token,0x182f,,,0x182f,,,,,
-56552835,0x4aa9a1e99f34a9ee2c0eefaef336d93ab2d89b0c61f93d4d9ceed7b815242b19,list_token,0x162d,,,0x162d,,,0x6c5db2a4d815dc0000,,
+method,params__to,params__tokenId,block_height,txHash,tokenId,params__token_id,params__orderId,params__amount,params__price,params__starting_price,params__duration_in_hours,params__address,params__token_URI,params_txHash,idx
+transfer,cxfc763b2b1bedc9716b68d8d36e7d75bd8f3053b1,7,25354207,0x50e79cfdf53488022d3bb2430233d1608a6e458d2dd5cbdaffe39f5f3091c431,7,,,,,,,,,,2535420700000001

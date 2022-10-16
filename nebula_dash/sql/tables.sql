@@ -15,6 +15,7 @@ drop table if exists ship_owners;
 drop table if exists items;
 drop table if exists trxn;
 drop table if exists trxn_data;
+drop table if exists trxn_events;
 */
 
 create table if not exists planets (
@@ -180,8 +181,9 @@ create table if not exists items (
 );
 
 create table if not exists trxn (
-    tx_hash varchar(200) not null constraint pk_trxn primary key,
+    tx_id bigint not null constraint pk_trxn primary key,
     block_height bigint not null,
+    tx_hash varchar(200) not null,
     timestamp bigint not null,
     from_address varchar(50) not null,
     to_address varchar(50) not null,
@@ -199,8 +201,9 @@ create table if not exists trxn (
 );
 
 create table if not exists trxn_data (
-    tx_hash varchar(200) not null constraint pk_trxn_data primary key,
+    tx_data_id bigint not null constraint pk_trxn_data primary key,
     block_height bigint not null,
+    tx_hash varchar(200) not null,
     method varchar(100) not null,
     token_id integer null,
     params__to varchar(50) null,
@@ -211,9 +214,27 @@ create table if not exists trxn_data (
     params__price varchar(50) null,
     params__starting_price varchar(50) null,
     params__duration_in_hours varchar(50) null,
+    params__address varchar(50) null,
+    params__token_uri varchar(50) null,
+    params_tx_hash varchar(200) null,
 	created_at timestamp not null default current_timestamp,
     updated_at timestamp null
 );
+
+create table if not exists trxn_events (
+    tx_event_id bigint not null constraint pk_trxn_events primary key,
+    block_height bigint not null,
+    tx_hash varchar(200) not null,
+    status smallint not null,
+    to_address varchar(50) not null,
+    score_address varchar(50) not null,
+    indexed varchar(1000) null,
+    data varchar(1000) null,
+    tx_index smallint not null,
+	created_at timestamp not null default current_timestamp,
+    updated_at timestamp null
+);
+
 
 /*
 select * from planets;
@@ -230,4 +251,5 @@ select * from ship_owners;
 select * from items;
 select * from trxn;
 select * from trxn_data;
+select * from trxn_events;
 */
