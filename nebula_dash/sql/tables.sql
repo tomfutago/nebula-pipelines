@@ -180,6 +180,15 @@ create table if not exists items (
     updated_at timestamp null
 );
 
+create table if not exists item_owners (
+    item_id integer not null,
+    owner varchar(50) not null,
+    total smallint null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp null,
+    constraint pk_item_owners primary key (item_id, owner)
+);
+
 create table if not exists trxn (
     tx_id bigint not null constraint pk_trxn primary key,
     block_height bigint not null,
@@ -188,7 +197,7 @@ create table if not exists trxn (
     from_address varchar(50) not null,
     to_address varchar(50) not null,
     value numeric(50,0) not null,
-    data_method varchar(100) not null,
+    data_method varchar(100) null,
     data_params varchar(1000) null,
     data_type varchar(50) not null,
     nid integer null,
@@ -197,14 +206,16 @@ create table if not exists trxn (
     signature varchar(200) not null,
     version smallint not null,
     created_at timestamp not null default current_timestamp,
-    updated_at timestamp null
+    updated_at timestamp null,
+    data_content_type varchar(50) null,
+    data_content text null
 );
 
 create table if not exists trxn_data (
     tx_data_id bigint not null constraint pk_trxn_data primary key,
     block_height bigint not null,
     tx_hash varchar(200) not null,
-    method varchar(100) not null,
+    method varchar(100) null,
     token_id integer null,
     params__to varchar(50) null,
     params__token_id varchar(50) null,

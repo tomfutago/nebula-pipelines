@@ -493,8 +493,36 @@ def pull_item_data():
 
 ############################################
 def pull_item_owners():
-    pass
-    # userTokenBalances (address, offset=0) - loop through unique list of wallets based on planet and ship owners
+    # loop through unique list of wallets based on planet and ship owners
+    sql = 'select owner from vw_unique_owners;'
+    with db_engine.connect() as conn:
+        query_results = conn.execute(statement=sql)
+        for row in query_results:
+            item_owner_list = []
+            print(row.owner)
+            
+            try:
+                items = call(NebulaMultiTokenCx, "userTokenBalances", {"_owner": row.owner, "_offset": 0})
+            except:
+                continue
+    
+            for i in items:
+                print(hex_to_int(i[0]), ":", hex_to_int(i[1]))
+                item_owner_list.append([hex_to_int(i[0]), row.owner, hex_to_int(i[1])])
+
+            # write to db
+            df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"])
+            df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
+
+            # prep and upsert data
+            data_transform_and_load(
+                df_to_load=df_item_owners,
+                table_name="item_owners",
+                list_of_col_names=[
+                    "item_id","owner","total"
+                ],
+                extra_update_fields={"updated_at": "NOW()"}
+            )
 
 
 ############################################
@@ -512,10 +540,10 @@ def pull_nebula_txns():
     #block_height = get_table_max_id(table_name="trxn", column_name="tx_id")
 
     #block_height = 25353586 # first mint
-    block_height = 26167300 # last stop
+    block_height = 27462330 # last stop
     
     while True:
-    #while block_height == 25912807:  #< 25365304 + 10000:
+    #while block_height == 26495164:  #< 25365304 + 10000:
         try:
             block = icon_service.get_block(block_height)
             print("block:", block_height)
@@ -544,6 +572,7 @@ def pull_nebula_txns():
                             df_tx = pd.json_normalize(tx, max_level=1, sep="_")
                             df_tx["block_height"] = block_height
                             df_tx["idx"] = block_height * 100000000 + n # generated PK
+                            
                             # fields requiring extra attention:
                             if "value" not in df_tx:
                                 df_tx["value"] = 0
@@ -551,6 +580,10 @@ def pull_nebula_txns():
                                 df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
                             else:
                                 df_tx["data_params"] = None
+                            if "data_content" not in df_tx:
+                                df_tx["data_contentType"] = None
+                                df_tx["data_content"] = None
+                            
                             tx_list.append(df_tx)
 
                             # -----------------------
@@ -563,7 +596,8 @@ def pull_nebula_txns():
                                 table_name="trxn",
                                 list_of_col_names=[
                                     "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
-                                    "data_type","nid","nonce","step_limit","signature","version","data_params"
+                                    "data_type","nid","nonce","step_limit","signature","version","data_params",
+                                    "data_content_type","data_content"
                                 ],
                                 rename_mapper={
                                     "idx": "tx_id",
@@ -571,7 +605,8 @@ def pull_nebula_txns():
                                     "to": "to_address",
                                     "txHash": "tx_hash",
                                     "dataType": "data_type",
-                                    "stepLimit": "step_limit"
+                                    "stepLimit": "step_limit",
+                                    "data_contentType": "data_content_type"
                                 },
                                 extra_update_fields={"updated_at": "NOW()"}
                             )
@@ -670,4 +705,5 @@ def pull_nebula_txns():
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
-pull_nebula_txns()
+pull_item_owners()
+#pull_nebula_txns()

@@ -1,2 +1,2 @@
-method,params__to,params__token_id,params__token_URI,block_height,txHash,tokenId,params__tokenId,params__orderId,params__amount,params__price,params__starting_price,params__duration_in_hours,params__address,params_txHash,idx
-mint,hxd46d44827c10876ee8c5464d7882205d6c3a492f,122,122,25741488,0x38b3a5c898aae94d7bb8536b22313401b7d0bebee66c1797c64cd81739789146,122,,,,,,,,,2574148800000001
+method,params__to,params__tokenId,block_height,txHash,tokenId,params__token_id,params__orderId,params__amount,params__price,params__starting_price,params__duration_in_hours,params__address,params__token_URI,params_txHash,idx
+transfer,hx88e502b8b5012bea871229b7e0834cf759cc5e97,739,27455102,0x9a71bbb4dd6a8a9094a11af0640c3dd1bf826a91992bd3da0738f964189a32d5,739,,,,,,,,,,2745510200000001

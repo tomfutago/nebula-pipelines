@@ -277,3 +277,42 @@ from planet_owners po
 where po.owner = 'hxxxxx'
 order by p.generation, p.name, pd.layer_number, s.rn;
 
+-- materials - list
+select distinct item_id, material_rarity, item_name
+from planet_deposits_discovered
+order by 2,3
+
+-- probes
+with cte_probes as (
+    select
+     p.id,
+     p.material_rarity,
+     p.item_name,
+     p.workshop,
+     p.probe,
+     p.build_time,
+     sum(case when total_amount < 2000 then 1 else 0 end) as in_s,
+     sum(case when total_amount >= 2000 and total_amount < 4000 then 1 else 0 end) as in_m,
+     sum(case when total_amount >= 4000 then 1 else 0 end) as in_l,
+     count(*) as in_total,
+     sum(total_amount) as discovered_total,
+     sum(prepared_amount) as prepared_total,
+     sum(extracted_amount) as extracted_total
+    from probes p
+     join planet_deposits_discovered pdd on p.item_id = pdd.item_id
+     join planet_owners po on pdd.planet_id = po.planet_id
+    where po.owner = 'hxxxxx'
+    group by 1,2,3,4,5,6
+)
+select
+ material_rarity, item_name, workshop, probe, build_time,
+ in_s, in_m, in_l, in_total,
+ in_s * 5 as need_s,
+ in_m * 8 as need_m,
+ in_l * 10 as need_l,
+ in_s * 5 + in_m * 8 + in_l * 10 as need_total,
+ (in_s * 5 + in_m * 8 + in_l * 10) * build_time as build_time_total,
+ discovered_total, prepared_total, extracted_total
+from cte_probes
+order by id;
+
