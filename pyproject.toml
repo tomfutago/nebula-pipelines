@@ -13,6 +13,7 @@ iconsdk = "^2.2.0"
 python-dotenv = "^0.21.0"
 SQLAlchemy = "^1.4.41"
 psycopg2-binary = "^2.9.4"
+discord-webhook = "^0.17.0"
 
 [build-system]
 requires = ["poetry-core"]

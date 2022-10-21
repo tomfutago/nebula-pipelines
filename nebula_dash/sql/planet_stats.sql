@@ -44,7 +44,16 @@ from planets
 group by 1,2
 order by 1,2;
 
--- planet specials - list
+-- planet specials - generic stats
+select
+ ps.name,
+ count(*)
+from planets p
+ join planet_specials ps on p.planet_id = ps.planet_id
+group by 1
+order by 2;
+
+-- planet specials - list per address
 select
  ps.planet_id,
  max(case when right(ps.id::varchar(20), 1) = '1' then ps.name end) as special_1,
@@ -234,6 +243,43 @@ from planet_owners po
 where po.owner = 'hxxxxx'
 group by 1,2
 order by 1,2;
+
+-- planet surveying - discovered vs undiscovered
+select
+ p.generation,
+ pd.layer_number,
+ s.size,
+ sum(case when pdd.planet_layer_id is not null then 1 else 0 end) as discovered_count,
+ sum(case when pdd.planet_layer_id is null then 1 else 0 end) as undiscovered_count,
+ count(*) - case when p.generation = 'GEN-0' then 1100 when p.generation = 'GEN-1' then 5000 else 0 end as extras_total,
+ count(*) as grand_total
+from planets p
+ join planet_deposits pd on p.planet_id = pd.planet_id
+ cross join (
+    select 1, 'small' union
+    select 2, 'medium' union
+    select 3, 'large'
+  ) s (rn, size)
+ left join (
+    select
+     planet_id,
+     planet_layer_id,
+     item_name,
+     material_rarity,
+     total_amount,
+     prepared_amount,
+     extracted_amount,
+     preparable_amount,
+     extractable_amount,
+     case
+       when total_amount < 2000 then 'small'
+       when total_amount >= 2000 and total_amount < 4000 then 'medium'
+       when total_amount >= 4000 then 'large'
+     end as size
+    from planet_deposits_discovered
+ ) pdd on pd.planet_layer_id = pdd.planet_layer_id and s.size = pdd.size
+group by p.generation, pd.layer_number, s.size, s.rn
+order by p.generation, pd.layer_number, s.rn;
 
 -- planet surveying - list
 select

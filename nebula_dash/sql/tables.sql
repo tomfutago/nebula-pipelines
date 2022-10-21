@@ -229,7 +229,14 @@ create table if not exists trxn_data (
     params__token_uri varchar(50) null,
     params_tx_hash varchar(200) null,
 	created_at timestamp not null default current_timestamp,
-    updated_at timestamp null
+    updated_at timestamp null,
+    params__id varchar(50) null,
+    params__from varchar(50) null,
+    params__value varchar(50) null,
+    params__owner varchar(50) null,
+    params__ids varchar(50) null,
+    params__amounts varchar(50) null,
+    params__transfer_id varchar(50) null
 );
 
 create table if not exists trxn_events (

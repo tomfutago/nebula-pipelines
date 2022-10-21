@@ -1,4 +1,4 @@
-import os
+import os, sys
 import requests
 import numpy as np
 import pandas as pd
@@ -10,11 +10,13 @@ from typing import Optional, Dict, List
 from iconsdk.icon_service import IconService
 from iconsdk.providers.http_provider import HTTPProvider
 from iconsdk.builder.call_builder import CallBuilder
+from discord_webhook import DiscordWebhook
 
 # load env variables
 load_dotenv()
-db_string = os.getenv('DB_STRING')
-db_schema = os.getenv('DB_SCHEMA')
+db_string = os.getenv("DB_STRING")
+db_schema = os.getenv("DB_SCHEMA")
+discord_log_webhook = os.getenv("DISCORD_LOG_WEBHOOK")
 
 # create db engine
 db_engine = db.create_engine(db_string)
@@ -140,18 +142,32 @@ def data_transform_and_load(
     # if it got that far without any errors - notify a successful completion
     return True
 
-def get_table_max_id(table_name: str, column_name: str) -> int:
+def get_table_max_val(table_name: str, column_name: str):
     """
     Get MAX(column_name) for given table_name
     """
-    sql = 'SELECT MAX({}) AS max_id FROM {}.{};'.format(column_name, db_schema, table_name)
+    sql = 'SELECT MAX({}) AS max_val FROM {}.{};'.format(column_name, db_schema, table_name)
     with db_engine.connect() as conn:
         result = conn.execute(statement=sql)
         for row in result:
-            max_id = row.max_id
-        if max_id is None:
-            max_id = 0
-    return max_id
+            max_val = row.max_val
+        if max_val is None:
+            max_val = 0
+    return max_val
+
+# function for sending error msg to discord webhook
+def send_log_to_webhook(block_height: int, txHash: str, error: str):
+    err_msg = "Nebula Dash log"
+    err_msg += "\nblock_height: " + str(block_height)
+    err_msg += "\ntxHash: " + txHash
+    err_msg += "\nERROR: " + error
+    err_msg += "\n"
+    print("1..")
+    webhook = DiscordWebhook(url=discord_log_webhook, rate_limit_retry=True, content=err_msg)
+    print("2..")
+    response = webhook.execute()
+    print("3..")
+    return response
 
 
 ############################################
@@ -528,22 +544,19 @@ def pull_item_owners():
 ############################################
 def pull_nebula_txns():
     # latest block height
+    #block_height = get_table_max_val(table_name="trxn", column_name="tx_id")
     #block_height = icon_service.get_block("latest")["height"]
 
-    """
-    # just test:
-    blocks = [56553844,56561982,56560250,56552835] # [transfer,delist_token,purchase_token,list_token]
-    #block_height = 56553844 # transfer
-    for block_height in blocks:
-    """
+    #blocks = [29338046,29338034,29338021,29338010,29337997,29337985,29337973,29337961,29337928,29337907]
+    #blocks.reverse()
 
-    #block_height = get_table_max_id(table_name="trxn", column_name="tx_id")
 
     #block_height = 25353586 # first mint
-    block_height = 27462330 # last stop
+    block_height = 30593390 # last stop
     
     while True:
-    #while block_height == 26495164:  #< 25365304 + 10000:
+    #while block_height == 56861361:
+    #for block_height in blocks:
         try:
             block = icon_service.get_block(block_height)
             print("block:", block_height)
@@ -551,7 +564,7 @@ def pull_nebula_txns():
             sleep(2)
             continue
         else:
-            #try:
+            try:
                 tx_list = []
                 tx_data_list = []
                 tx_event_list = []
@@ -560,143 +573,164 @@ def pull_nebula_txns():
                 for tx in block["confirmed_transaction_list"]:
                     if "to" in tx:
                         if tx["to"] in NebulaCxList or tx["from"] in NebulaCxList:
-                            # trxn counter per block
-                            n += 1
-                            # check if tx was successful - if not skip and move on
-                            txResult = icon_service.get_transaction_result(tx["txHash"])
-                            # status : 1 on success, 0 on failure
-                            if txResult["status"] == 0:
-                                continue
+                            try:
+                                # trxn counter per block
+                                n += 1
+                                # check if tx was successful - if not skip and move on
+                                txResult = icon_service.get_transaction_result(tx["txHash"])
+                                # status : 1 on success, 0 on failure
+                                if txResult["status"] == 0:
+                                    continue
 
-                            # -----------------------
-                            df_tx = pd.json_normalize(tx, max_level=1, sep="_")
-                            df_tx["block_height"] = block_height
-                            df_tx["idx"] = block_height * 100000000 + n # generated PK
-                            
-                            # fields requiring extra attention:
-                            if "value" not in df_tx:
-                                df_tx["value"] = 0
-                            if "data_params" in df_tx:
-                                df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
-                            else:
-                                df_tx["data_params"] = None
-                            if "data_content" not in df_tx:
-                                df_tx["data_contentType"] = None
-                                df_tx["data_content"] = None
-                            
-                            tx_list.append(df_tx)
-
-                            # -----------------------
-                            df_txns = pd.concat(tx_list)
-                            df_txns.to_csv("./tests/samples/txns.csv", index=False)
-
-                            # prep and upsert data
-                            data_transform_and_load(
-                                df_to_load=df_tx,
-                                table_name="trxn",
-                                list_of_col_names=[
-                                    "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
-                                    "data_type","nid","nonce","step_limit","signature","version","data_params",
-                                    "data_content_type","data_content"
-                                ],
-                                rename_mapper={
-                                    "idx": "tx_id",
-                                    "from": "from_address",
-                                    "to": "to_address",
-                                    "txHash": "tx_hash",
-                                    "dataType": "data_type",
-                                    "stepLimit": "step_limit",
-                                    "data_contentType": "data_content_type"
-                                },
-                                extra_update_fields={"updated_at": "NOW()"}
-                            )
-
-                            # -----------------------
-                            if "data" in tx:
-                                df_tx_data = pd.json_normalize(tx["data"], sep="_")
-                                # expected column list:
-                                tx_data_columns=[
-                                    "block_height", "txHash", "method", "tokenId",
-                                    "params__to", "params__tokenId", "params__token_id", 
-                                    "params__orderId", "params__amount", "params__price",
-                                    "params__starting_price", "params__duration_in_hours",
-                                    "params__address", "params__token_URI", "params_txHash"
-                                ]
-                                # add missing columns:
-                                df_tx_data_cols = df_tx_data.columns.to_list()
-                                for c in tx_data_columns:
-                                    if c not in df_tx_data_cols:
-                                        df_tx_data[c] = None
+                                # -----------------------
+                                # trxn
+                                # -----------------------
+                                df_tx = pd.json_normalize(tx, max_level=1, sep="_")
+                                df_tx["block_height"] = block_height
+                                df_tx["idx"] = block_height * 100000000 + n # generated PK
                                 
-                                df_tx_data["block_height"] = block_height
-                                df_tx_data["idx"] = block_height * 100000000 + n # generated PK
-                                df_tx_data["txHash"] = df_tx["txHash"]
-                                df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
-                                df_tx_data["tokenId"] = df_tx_data["tokenId"].apply(hex_to_int)
-                                tx_data_list.append(df_tx_data)
-                            
+                                # fields requiring extra attention:
+                                if "value" not in df_tx:
+                                    df_tx["value"] = 0
+                                if "data_params" in df_tx:
+                                    df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
+                                else:
+                                    df_tx["data_params"] = None
+                                if "data_content" not in df_tx:
+                                    df_tx["data_contentType"] = None
+                                    df_tx["data_content"] = None
+                                
+                                tx_list.append(df_tx)
+
                                 # -----------------------
-                                df_tx_data = pd.concat(tx_data_list)
-                                df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+                                df_txns = pd.concat(tx_list)
+                                df_txns.to_csv("./tests/samples/txns.csv", index=False)
 
                                 # prep and upsert data
                                 data_transform_and_load(
-                                    df_to_load=df_tx_data,
-                                    table_name="trxn_data",
+                                    df_to_load=df_tx,
+                                    table_name="trxn",
                                     list_of_col_names=[
-                                        "tx_data_id", "tx_hash","block_height","method","token_id","params__to","params__token_id","params__token_id_2",
-                                        "params__order_id","params__amount","params__price","params__starting_price","params__duration_in_hours",
-                                        "params__address", "params__token_uri", "params_tx_hash"
+                                        "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
+                                        "data_type","nid","nonce","step_limit","signature","version","data_params",
+                                        "data_content_type","data_content"
                                     ],
                                     rename_mapper={
-                                        "idx": "tx_data_id",
-                                        "txHash": "tx_hash",
-                                        "tokenId": "token_id",
-                                        "params__tokenId": "params__token_id_2",
-                                        "params__orderId": "params__order_id",
-                                        "params__token_URI": "params__token_uri",
-                                        "params_txHash": "params_tx_hash"
-                                    },
-                                    extra_update_fields={"updated_at": "NOW()"}
-                                )
-
-                            # -----------------------
-                            if "eventLogs" in txResult:
-                                df_tx_events = pd.json_normalize(
-                                    txResult,
-                                    record_path=["eventLogs"],
-                                    meta=["blockHeight", "status", "to", "txHash", "txIndex"],
-                                    sep="_"
-                                )
-                                df_tx_events["idx"] = block_height * 100000000 + n * 100 + df_tx_events.index + 1 # generated PK
-                                tx_event_list.append(df_tx_events)
-
-                                # -----------------------
-                                df_tx_events = pd.concat(tx_event_list)
-                                df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
-
-                                # prep and upsert data
-                                data_transform_and_load(
-                                    df_to_load=df_tx_events,
-                                    table_name="trxn_events",
-                                    list_of_col_names=[
-                                        "tx_event_id","block_height","status","to_address","score_address",
-                                        "indexed","data","tx_hash","tx_index"
-                                    ],
-                                    rename_mapper={
-                                        "idx": "tx_event_id",
-                                        "blockHeight": "block_height",
+                                        "idx": "tx_id",
+                                        "from": "from_address",
                                         "to": "to_address",
-                                        "scoreAddress": "score_address",
                                         "txHash": "tx_hash",
-                                        "txIndex": "tx_index"
+                                        "dataType": "data_type",
+                                        "stepLimit": "step_limit",
+                                        "data_contentType": "data_content_type"
                                     },
                                     extra_update_fields={"updated_at": "NOW()"}
                                 )
+
+                                # -----------------------
+                                # trxn_data
+                                # -----------------------
+                                if "data" in tx:
+                                    df_tx_data = pd.json_normalize(tx["data"], sep="_")
+                                    # expected column list:
+                                    tx_data_columns=[
+                                        "block_height", "txHash", "method", "tokenId",
+                                        "params__to", "params__tokenId", "params__token_id", 
+                                        "params__orderId", "params__amount", "params__price",
+                                        "params__starting_price", "params__duration_in_hours",
+                                        "params__address", "params__token_URI", "params_txHash",
+                                        "params__id","params__from","params__value","params__owner",
+                                        "params__ids","params__amounts","params__transferId"
+                                    ]
+                                    # add missing columns:
+                                    df_tx_data_cols = df_tx_data.columns.to_list()
+                                    for c in tx_data_columns:
+                                        if c not in df_tx_data_cols:
+                                            df_tx_data[c] = None
+                                    
+                                    df_tx_data["block_height"] = block_height
+                                    df_tx_data["idx"] = block_height * 100000000 + n # generated PK
+                                    df_tx_data["txHash"] = df_tx["txHash"]
+                                    df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
+                                    df_tx_data["tokenId"] = df_tx_data["tokenId"].apply(hex_to_int)
+                                    tx_data_list.append(df_tx_data)
+                                
+                                    # -----------------------
+                                    df_tx_data = pd.concat(tx_data_list)
+                                    df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+
+                                    # prep and upsert data
+                                    data_transform_and_load(
+                                        df_to_load=df_tx_data,
+                                        table_name="trxn_data",
+                                        list_of_col_names=[
+                                            "tx_data_id", "tx_hash","block_height","method","token_id","params__to",
+                                            "params__token_id","params__token_id_2","params__order_id","params__amount",
+                                            "params__price","params__starting_price","params__duration_in_hours",
+                                            "params__address", "params__token_uri", "params_tx_hash",
+                                            "params__id","params__from","params__value","params__owner",
+                                            "params__ids","params__amounts","params__transfer_id"
+                                        ],
+                                        rename_mapper={
+                                            "idx": "tx_data_id",
+                                            "txHash": "tx_hash",
+                                            "tokenId": "token_id",
+                                            "params__tokenId": "params__token_id_2",
+                                            "params__orderId": "params__order_id",
+                                            "params__token_URI": "params__token_uri",
+                                            "params_txHash": "params_tx_hash",
+                                            "params__transferId": "params__transfer_id"
+                                        },
+                                        extra_update_fields={"updated_at": "NOW()"}
+                                    )
+
+                                # -----------------------
+                                # trxn_events
+                                # -----------------------
+                                if "eventLogs" in txResult:
+                                    df_tx_events = pd.json_normalize(
+                                        txResult,
+                                        record_path=["eventLogs"],
+                                        meta=["blockHeight", "status", "to", "txHash", "txIndex"],
+                                        sep="_"
+                                    )
+                                    df_tx_events["idx"] = block_height * 100000000 + n * 100 + df_tx_events.index + 1 # generated PK
+                                    tx_event_list.append(df_tx_events)
+
+                                    # -----------------------
+                                    df_tx_events = pd.concat(tx_event_list)
+                                    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+
+                                    # prep and upsert data
+                                    data_transform_and_load(
+                                        df_to_load=df_tx_events,
+                                        table_name="trxn_events",
+                                        list_of_col_names=[
+                                            "tx_event_id","block_height","status","to_address","score_address",
+                                            "indexed","data","tx_hash","tx_index"
+                                        ],
+                                        rename_mapper={
+                                            "idx": "tx_event_id",
+                                            "blockHeight": "block_height",
+                                            "to": "to_address",
+                                            "scoreAddress": "score_address",
+                                            "txHash": "tx_hash",
+                                            "txIndex": "tx_index"
+                                        },
+                                        extra_update_fields={"updated_at": "NOW()"}
+                                    )
+                            except:
+                                #send to log webhook
+                                err_msg = "{}. {}, line: {}".format(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2].tb_lineno)
+                                print(err_msg)
+                                send_log_to_webhook(block_height, tx["txHash"], err_msg)
+                                #continue
+                                break
                 block_height += 1
-            #except:
-            #    sleep(2)
-            #    continue
+            except:
+                sleep(2)
+                #continue
+                break
 
 
 ############################################
@@ -705,5 +739,5 @@ def pull_nebula_txns():
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
-pull_item_owners()
-#pull_nebula_txns()
+#pull_item_owners()
+pull_nebula_txns()

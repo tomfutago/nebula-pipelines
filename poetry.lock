@@ -63,6 +63,20 @@ toolz = ">=0.8.0"
 cython = ["cython"]
 
 [[package]]
+name = "discord-webhook"
+version = "0.17.0"
+description = "execute discord webhooks"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = ">=2.19.1"
+
+[package.extras]
+async = ["httpx (>=0.20.0)"]
+
+[[package]]
 name = "eth-hash"
 version = "0.3.3"
 description = "eth-hash: The Ethereum hashing function, keccak256, sometimes (erroneously) called sha3"
@@ -372,7 +386,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "138deb17e36f287fc0cd8a2f52d6c94b0777f2b7f218414cd325944dfe1c153a"
+content-hash = "c01c692839691bf191d63300f90543c8ff409f53fe57256670b9bdd2e33c9261"
 
 [metadata.files]
 asn1crypto = [
@@ -567,6 +581,10 @@ cytoolz = [
     {file = "cytoolz-0.12.0-pp39-pypy39_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f909760f89a54d860cf960b4cd828f9f6301fb104cd0de5b15b16822c9c4828b"},
     {file = "cytoolz-0.12.0-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:a8e69c9f3a32e0f9331cf6707a0f159c6dec0ff2a9f41507f6b2d06cd423f0d0"},
     {file = "cytoolz-0.12.0.tar.gz", hash = "sha256:c105b05f85e03fbcd60244375968e62e44fe798c15a3531c922d531018d22412"},
+]
+discord-webhook = [
+    {file = "discord-webhook-0.17.0.tar.gz", hash = "sha256:bb47e5fc83f73614d7b2a3764b84359b52c96a94aadf3302bc3c067dd21b43cc"},
+    {file = "discord_webhook-0.17.0-py3-none-any.whl", hash = "sha256:d869849c4834f928f5c22597dc7600b1a30f9e797d1aeb1d4196711a243d9a73"},
 ]
 eth-hash = [
     {file = "eth-hash-0.3.3.tar.gz", hash = "sha256:8cde211519ff1a98b46e9057cb909f12ab62e263eb30a0a94e2f7e1f46ac67a0"},
