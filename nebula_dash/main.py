@@ -14,7 +14,7 @@ from discord_webhook import DiscordWebhook
 
 # load env variables
 load_dotenv()
-db_string = os.getenv("DATABASE_URL")
+db_string = os.getenv("DATABASE_URL").replace("://", "ql://", 1) # workaround as DATABASE_URL env can't be edited on Heroku
 db_schema = os.getenv("DB_SCHEMA")
 discord_log_webhook = os.getenv("DISCORD_LOG_WEBHOOK")
 
