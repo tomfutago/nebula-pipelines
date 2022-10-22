@@ -544,7 +544,7 @@ def pull_item_owners():
 ############################################
 def pull_nebula_txns():
     # latest block height
-    #block_height = get_table_max_val(table_name="trxn", column_name="tx_id")
+    block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
     #blocks = [29338046,29338034,29338021,29338010,29337997,29337985,29337973,29337961,29337928,29337907]
@@ -552,7 +552,7 @@ def pull_nebula_txns():
 
 
     #block_height = 25353586 # first mint
-    block_height = 30593390 # last stop
+    #block_height = 30593390 # last stop
     
     while True:
     #while block_height == 56861361:
