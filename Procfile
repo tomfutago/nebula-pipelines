@@ -1,1 +1,1 @@
-worker: python nebula_dash/main.py
+worker: python nebula_pipelines/main.py

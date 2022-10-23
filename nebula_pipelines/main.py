@@ -157,7 +157,7 @@ def get_table_max_val(table_name: str, column_name: str):
 
 # function for sending error msg to discord webhook
 def send_log_to_webhook(block_height: int, txHash: str, error: str):
-    err_msg = "Nebula Dash log"
+    err_msg = "Nebula Pipelines log"
     err_msg += "\nblock_height: " + str(block_height)
     err_msg += "\ntxHash: " + txHash
     err_msg += "\nERROR: " + error

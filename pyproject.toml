@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "nebula-dash"
+name = "nebula-pipelines"
 version = "0.1.0"
 description = ""
 authors = ["tomfutago <tomfutago@gmail.com>"]
 readme = "README.md"
-packages = [{include = "nebula_dash"}]
+packages = [{include = "nebula_pipelines"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
