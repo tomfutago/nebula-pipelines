@@ -146,7 +146,7 @@ def get_table_max_val(table_name: str, column_name: str):
     """
     Get MAX(column_name) for given table_name
     """
-    sql = 'SELECT MAX({}) AS max_val FROM {}.{};'.format(column_name, db_schema, table_name)
+    sql = 'select max({}) as max_val from {}.{};'.format(column_name, db_schema, table_name)
     with db_engine.connect() as conn:
         result = conn.execute(statement=sql)
         for row in result:
@@ -154,6 +154,15 @@ def get_table_max_val(table_name: str, column_name: str):
         if max_val is None:
             max_val = 0
     return max_val
+
+def truncate_table(table_name: str):
+    """
+    Truncate data in given table_name
+    """
+    sql = 'truncate table {}.{};'.format(db_schema, table_name)
+    with db_engine.connect() as conn:
+        conn.execution_options(autocommit=True)
+        conn.execute(statement=sql)
 
 # function for sending error msg to discord webhook
 def send_log_to_webhook(block_height: int, txHash: str, error: str):
@@ -352,6 +361,9 @@ def pull_planet_data():
 
 ############################################
 def pull_planet_owners():
+    # flush table before filling it again
+    truncate_table("planet_owners")
+
     # retrieve total supply of tokens and convert hex result to int
     #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
     totalSupply = 7000 # replace with sqlalchemy view listing all pulled tokenIDs
@@ -443,6 +455,9 @@ def pull_ship_data():
 
 ############################################
 def pull_ship_owners():
+    # flush table before filling it again
+    truncate_table("ship_owners")
+
     # retrieve total supply of tokens and convert hex result to int
     totalSupply = hex_to_int(call(NebulaSpaceshipTokenCx, "totalSupply", {}))
     # retrieve current owners
@@ -509,8 +524,11 @@ def pull_item_data():
 
 ############################################
 def pull_item_owners():
+    # flush table before filling it again
+    truncate_table("item_owners")
+    
     # loop through unique list of wallets based on planet and ship owners
-    sql = 'select owner from vw_unique_owners;'
+    sql = "select owner from vw_unique_owners;"
     with db_engine.connect() as conn:
         query_results = conn.execute(statement=sql)
         for row in query_results:
@@ -739,5 +757,5 @@ def pull_nebula_txns():
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
-#pull_item_owners()
-pull_nebula_txns()
+pull_item_owners()
+#pull_nebula_txns()
