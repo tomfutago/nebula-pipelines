@@ -1,15 +1,26 @@
--- planet owners + total count
+-- planet owners
+create or replace view vw_planet_owners as
 select
- concat(substring(po.owner, 1, 8), '..', substring(po.owner, 34, 24)) as owner,
+ po.planet_id,
+ po.owner,
+ concat(substring(po.owner, 1, 8), '..', substring(po.owner, 34, 24)) as owner_o
+from planet_owners po;
+
+-- planet owners + total count
+create or replace view vw_planet_owner_stats as
+select
+ po.owner,
+ po.owner_o,
  count(*) as planet_count
 from planets p
- join planet_owners po on p.planet_id = po.planet_id
-group by 1
-order by 2 desc;
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2;
 
 -- planet owners + total count per rarity
+create or replace view vw_planet_owner_stats_per_rarity as
 select
- concat(substring(po.owner, 1, 8), '..', substring(po.owner, 34, 24)) as owner,
+ po.owner,
+ po.owner_o,
  sum(case when p.rarity = 'common' then 1 else 0 end) as common,
  sum(case when p.rarity = 'uncommon' then 1 else 0 end) as uncommon,
  sum(case when p.rarity = 'rare' then 1 else 0 end) as rare,
@@ -17,13 +28,14 @@ select
  sum(case when p.rarity = 'mythic' then 1 else 0 end) as mythic,
  count(*) as planet_count
 from planets p
- join planet_owners po on p.planet_id = po.planet_id
-group by 1
-order by planet_count desc;
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2;
 
 -- planet owners + total count per type
+create or replace view vw_planet_owner_stats_per_type as
 select
- concat(substring(po.owner, 1, 8), '..', substring(po.owner, 34, 24)) as owner,
+ po.owner,
+ po.owner_o,
  sum(case when p.type = 'terrestrial' then 1 else 0 end) as terrestrial,
  sum(case when p.type = 'dust' then 1 else 0 end) as dust,
  sum(case when p.type = 'ocean' then 1 else 0 end) as ocean,
@@ -34,200 +46,213 @@ select
  sum(case when p.type = 'rogue' then 1 else 0 end) as rogue,
  count(*) as planet_count
 from planets p
- join planet_owners po on p.planet_id = po.planet_id
-group by 1
-order by planet_count desc;
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2;
 
 -- planets per region and sector
-select region, sector, count(*) as planet_count
+create or replace view vw_planets_per_region_and_sector as
+select
+ region,
+ sector,
+ count(*) as planet_count
 from planets
-group by 1,2
-order by 1,2;
+group by 1,2;
 
 -- planet specials - generic stats
+create or replace view vw_planet_global_specials_per_gen as
 select
- ps.name,
- count(*)
+ p.generation,
+ ps.name as special_name,
+ count(*) as special_count
 from planets p
  join planet_specials ps on p.planet_id = ps.planet_id
-group by 1
-order by 2;
+group by 1,2;
 
--- planet specials - list per address
+-- planet specials - pivot
+create or replace view vw_planet_specials as
 select
- ps.planet_id,
- max(case when right(ps.id::varchar(20), 1) = '1' then ps.name end) as special_1,
- max(case when right(ps.id::varchar(20), 1) = '2' then ps.name end) as special_2,
- max(case when right(ps.id::varchar(20), 1) = '3' then ps.name end) as special_3,
- max(case when right(ps.id::varchar(20), 1) = '4' then ps.name end) as special_4,
- max(case when right(ps.id::varchar(20), 1) = '5' then ps.name end) as special_5,
- max(case when right(ps.id::varchar(20), 1) = '6' then ps.name end) as special_6
-from planet_owners po
- join planets p on po.planet_id = p.planet_id
- join planet_specials ps on p.planet_id = ps.planet_id
-where po.owner = 'hxxxxx'
+ planet_id,
+ max(case when right(id::varchar(20), 1) = '1' then name else '' end) as special_1,
+ max(case when right(id::varchar(20), 1) = '2' then name else '' end) as special_2,
+ max(case when right(id::varchar(20), 1) = '3' then name else '' end) as special_3,
+ max(case when right(id::varchar(20), 1) = '4' then name else '' end) as special_4,
+ max(case when right(id::varchar(20), 1) = '5' then name else '' end) as special_5,
+ max(case when right(id::varchar(20), 1) = '6' then name else '' end) as special_6
+from planet_specials
+group by 1;
+
+-- planet upgrades - pivot
+create or replace view vw_planet_upgrades as
+select
+ planet_id,
+ max(case when right(rn::varchar(10), 1) = '1' then upgrade_slot_type else '' end) as upgrade_slot_type_1,
+ max(case when right(rn::varchar(10), 1) = '1' then upgrade_name else '' end) as upgrade_name_1,
+ max(case when right(rn::varchar(10), 1) = '2' then upgrade_slot_type else '' end) as upgrade_slot_type_2,
+ max(case when right(rn::varchar(10), 1) = '2' then upgrade_name else '' end) as upgrade_name_2,
+ max(case when right(rn::varchar(10), 1) = '3' then upgrade_slot_type else '' end) as upgrade_slot_type_3,
+ max(case when right(rn::varchar(10), 1) = '3' then upgrade_name else '' end) as upgrade_name_3,
+ max(case when right(rn::varchar(10), 1) = '4' then upgrade_slot_type else '' end) as upgrade_slot_type_4,
+ max(case when right(rn::varchar(10), 1) = '4' then upgrade_name else '' end) as upgrade_name_4,
+ max(case when right(rn::varchar(10), 1) = '5' then upgrade_slot_type else '' end) as upgrade_slot_type_5,
+ max(case when right(rn::varchar(10), 1) = '5' then upgrade_name else '' end) as upgrade_name_5,
+ max(case when right(rn::varchar(10), 1) = '6' then upgrade_slot_type else '' end) as upgrade_slot_type_6,
+ max(case when right(rn::varchar(10), 1) = '6' then upgrade_name else '' end) as upgrade_name_6,
+ max(case when right(rn::varchar(10), 1) = '7' then upgrade_slot_type else '' end) as upgrade_slot_type_7,
+ max(case when right(rn::varchar(10), 1) = '7' then upgrade_name else '' end) as upgrade_name_7,
+ max(case when right(rn::varchar(10), 1) = '8' then upgrade_slot_type else '' end) as upgrade_slot_type_8,
+ max(case when right(rn::varchar(10), 1) = '8' then upgrade_name else '' end) as upgrade_name_8,
+ max(case when right(rn::varchar(10), 1) = '9' then upgrade_slot_type else '' end) as upgrade_slot_type_9,
+ max(case when right(rn::varchar(10), 1) = '9' then upgrade_name else '' end) as upgrade_name_9,
+ max(case when right(rn::varchar(10), 1) = '10' then upgrade_slot_type else '' end) as upgrade_slot_type_10,
+ max(case when right(rn::varchar(10), 1) = '10' then upgrade_name else '' end) as upgrade_name_10
+from (
+    select
+     row_number() over (partition by planet_id order by upgrade_slot_id) as rn,
+     planet_id,
+     upgrade_slot_type,
+     upgrade_name
+    from planet_upgrades
+ ) t
+group by 1;
+
+-- planet collectibles - pivot
+create or replace view vw_planet_collectibles as
+select
+ planet_id,
+ max(case when type = 'artwork' then name else '' end) as artwork,
+ max(case when type = 'music' then name else '' end) as music,
+ max(case when type = 'lore' then name else '' end) as lore
+from planet_collectibles
 group by 1;
 
 -- planet specials - user totals
-select ps.name, count(*) as special_total
-from planet_owners po
- join planets p on po.planet_id = p.planet_id
- join planet_specials ps on p.planet_id = ps.planet_id
-where po.owner = 'hxxxxx'
-group by 1
-order by 1;
-
--- planet specials
+create or replace view vw_planet_owner_special_stats as
 select
- planet_id,
- max(case when right(rn::varchar(10), 1) = '1' then upgrade_slot_type end) as upgrade_slot_type_1,
- max(case when right(rn::varchar(10), 1) = '1' then upgrade_name end) as upgrade_name_1,
- max(case when right(rn::varchar(10), 1) = '2' then upgrade_slot_type end) as upgrade_slot_type_2,
- max(case when right(rn::varchar(10), 1) = '2' then upgrade_name end) as upgrade_name_2,
- max(case when right(rn::varchar(10), 1) = '3' then upgrade_slot_type end) as upgrade_slot_type_3,
- max(case when right(rn::varchar(10), 1) = '3' then upgrade_name end) as upgrade_name_3,
- max(case when right(rn::varchar(10), 1) = '4' then upgrade_slot_type end) as upgrade_slot_type_4,
- max(case when right(rn::varchar(10), 1) = '4' then upgrade_name end) as upgrade_name_4,
- max(case when right(rn::varchar(10), 1) = '5' then upgrade_slot_type end) as upgrade_slot_type_5,
- max(case when right(rn::varchar(10), 1) = '5' then upgrade_name end) as upgrade_name_5,
- max(case when right(rn::varchar(10), 1) = '6' then upgrade_slot_type end) as upgrade_slot_type_6,
- max(case when right(rn::varchar(10), 1) = '6' then upgrade_name end) as upgrade_name_6,
- max(case when right(rn::varchar(10), 1) = '7' then upgrade_slot_type end) as upgrade_slot_type_7,
- max(case when right(rn::varchar(10), 1) = '7' then upgrade_name end) as upgrade_name_7,
- max(case when right(rn::varchar(10), 1) = '8' then upgrade_slot_type end) as upgrade_slot_type_8,
- max(case when right(rn::varchar(10), 1) = '8' then upgrade_name end) as upgrade_name_8,
- max(case when right(rn::varchar(10), 1) = '9' then upgrade_slot_type end) as upgrade_slot_type_9,
- max(case when right(rn::varchar(10), 1) = '9' then upgrade_name end) as upgrade_name_9,
- max(case when right(rn::varchar(10), 1) = '10' then upgrade_slot_type end) as upgrade_slot_type_10,
- max(case when right(rn::varchar(10), 1) = '10' then upgrade_name end) as upgrade_name_10
-from (
-    select
-     row_number() over (partition by pu.planet_id order by pu.upgrade_slot_id) as rn,
-     pu.planet_id,
-     pu.upgrade_slot_type,
-     pu.upgrade_name
-    from planet_owners po
-     join planets p on po.planet_id = p.planet_id
-     join planet_upgrades pu on p.planet_id = pu.planet_id
-    where po.owner = 'hxxxxx'
-  ) t
-group by 1;
+ po.owner,
+ po.owner_o,
+ ps.name as special_name,
+ count(*) as special_total
+from vw_planet_owners po
+ join planet_specials ps on po.planet_id = ps.planet_id
+group by 1,2,3;
+
+-- planet specials - list per address
+create or replace view vw_planet_owner_specials as
+select
+ po.owner,
+ po.owner_o,
+ po.planet_id,
+ p.name as planet_name,
+ ps.special_1,
+ ps.special_2,
+ ps.special_3,
+ ps.special_4,
+ ps.special_5,
+ ps.special_6
+from vw_planet_owners po
+ join vw_planet_specials ps on po.planet_id = ps.planet_id
+ join planets p on ps.planet_id = p.planet_id;
+
+-- planet upgrades - list per address
+create or replace view vw_planet_owner_upgrades as
+select
+ po.owner,
+ po.owner_o,
+ po.planet_id,
+ p.name as planet_name,
+ pu.upgrade_slot_type_1,
+ pu.upgrade_name_1,
+ pu.upgrade_slot_type_2,
+ pu.upgrade_name_2,
+ pu.upgrade_slot_type_3,
+ pu.upgrade_name_3,
+ pu.upgrade_slot_type_4,
+ pu.upgrade_name_4,
+ pu.upgrade_slot_type_5,
+ pu.upgrade_name_5,
+ pu.upgrade_slot_type_6,
+ pu.upgrade_name_6,
+ pu.upgrade_slot_type_7,
+ pu.upgrade_name_7,
+ pu.upgrade_slot_type_8,
+ pu.upgrade_name_8,
+ pu.upgrade_slot_type_9,
+ pu.upgrade_name_9,
+ pu.upgrade_slot_type_10,
+ pu.upgrade_name_10
+from vw_planet_owners po
+ join vw_planet_upgrades pu on po.planet_id = pu.planet_id
+ join planets p on pu.planet_id = p.planet_id;
 
 -- planet collectibles
+create or replace view vw_planet_owner_collectibles as
 select
- pc.planet_id,
- max(case when pc.type = 'artwork' then pc.name end) as artwork,
- max(case when pc.type = 'music' then pc.name end) as music,
- max(case when pc.type = 'lore' then pc.name end) as lore
-from planet_owners po
- join planets p on po.planet_id = p.planet_id
- join planet_collectibles pc on p.planet_id = pc.planet_id
-where po.owner = 'hxxxxx'
-group by 1;
+ po.owner,
+ po.owner_o,
+ po.planet_id,
+ p.name as planet_name,
+ pc.artwork,
+ pc.music,
+ pc.lore
+from vw_planet_owners po
+ join vw_planet_collectibles pc on po.planet_id = pc.planet_id
+ join planets p on pc.planet_id = p.planet_id;
 
 -- planets overview per address
+create or replace view vw_planet_owner_overview as
 select
+ po.owner,
+ po.owner_o,
  p.planet_id,
- generation,
- sector,
- region,
- name,
- type,
- rarity,
- credits,
- industry,
- research,
- special_1,
- special_2,
- special_3,
- special_4,
- special_5,
- upgrade_slot_type_1,
- upgrade_name_1,
- upgrade_slot_type_2,
- upgrade_name_2,
- upgrade_slot_type_3,
- upgrade_name_3,
- upgrade_slot_type_4,
- upgrade_name_4,
- upgrade_slot_type_5,
- upgrade_name_5,
- upgrade_slot_type_6,
- upgrade_name_6,
- upgrade_slot_type_7,
- upgrade_name_7,
- upgrade_slot_type_8,
- upgrade_name_8,
- upgrade_slot_type_9,
- upgrade_name_9,
- upgrade_slot_type_10,
- upgrade_name_10,
- artwork,
- music,
- lore,
- image,
- external_link
-from planet_owners po
+ p.generation,
+ p.sector,
+ p.region,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_name,
+ p.type,
+ p.rarity,
+ p.credits,
+ p.industry,
+ p.research,
+ coalesce(ps.special_1, '') as special_1,
+ coalesce(ps.special_2, '') as special_2,
+ coalesce(ps.special_3, '') as special_3,
+ coalesce(ps.special_4, '') as special_4,
+ coalesce(ps.special_5, '') as special_5,
+ pu.upgrade_slot_type_1,
+ pu.upgrade_name_1,
+ pu.upgrade_slot_type_2,
+ pu.upgrade_name_2,
+ pu.upgrade_slot_type_3,
+ pu.upgrade_name_3,
+ pu.upgrade_slot_type_4,
+ pu.upgrade_name_4,
+ pu.upgrade_slot_type_5,
+ pu.upgrade_name_5,
+ pu.upgrade_slot_type_6,
+ pu.upgrade_name_6,
+ pu.upgrade_slot_type_7,
+ pu.upgrade_name_7,
+ pu.upgrade_slot_type_8,
+ pu.upgrade_name_8,
+ pu.upgrade_slot_type_9,
+ pu.upgrade_name_9,
+ pu.upgrade_slot_type_10,
+ pu.upgrade_name_10,
+ coalesce(pc.artwork, '') as artwork,
+ coalesce(pc.music, '') as music,
+ coalesce(pc.lore, '') as lore,
+ concat('<a href="', p.image, '" target="_blank" >', p.name, '.png</a>') as image_url
+from vw_planet_owners po
  join planets p on po.planet_id = p.planet_id
- left join (     
-    select
-     planet_id,
-     max(case when right(id::varchar(20), 1) = '1' then name end) as special_1,
-     max(case when right(id::varchar(20), 1) = '2' then name end) as special_2,
-     max(case when right(id::varchar(20), 1) = '3' then name end) as special_3,
-     max(case when right(id::varchar(20), 1) = '4' then name end) as special_4,
-     max(case when right(id::varchar(20), 1) = '5' then name end) as special_5,
-     max(case when right(id::varchar(20), 1) = '6' then name end) as special_6
-    from planet_specials
-    group by 1
-  ) ps on p.planet_id = ps.planet_id
- left join (
-    select
-     planet_id,
-     max(case when right(rn::varchar(10), 1) = '1' then upgrade_slot_type end) as upgrade_slot_type_1,
-     max(case when right(rn::varchar(10), 1) = '1' then upgrade_name end) as upgrade_name_1,
-     max(case when right(rn::varchar(10), 1) = '2' then upgrade_slot_type end) as upgrade_slot_type_2,
-     max(case when right(rn::varchar(10), 1) = '2' then upgrade_name end) as upgrade_name_2,
-     max(case when right(rn::varchar(10), 1) = '3' then upgrade_slot_type end) as upgrade_slot_type_3,
-     max(case when right(rn::varchar(10), 1) = '3' then upgrade_name end) as upgrade_name_3,
-     max(case when right(rn::varchar(10), 1) = '4' then upgrade_slot_type end) as upgrade_slot_type_4,
-     max(case when right(rn::varchar(10), 1) = '4' then upgrade_name end) as upgrade_name_4,
-     max(case when right(rn::varchar(10), 1) = '5' then upgrade_slot_type end) as upgrade_slot_type_5,
-     max(case when right(rn::varchar(10), 1) = '5' then upgrade_name end) as upgrade_name_5,
-     max(case when right(rn::varchar(10), 1) = '6' then upgrade_slot_type end) as upgrade_slot_type_6,
-     max(case when right(rn::varchar(10), 1) = '6' then upgrade_name end) as upgrade_name_6,
-     max(case when right(rn::varchar(10), 1) = '7' then upgrade_slot_type end) as upgrade_slot_type_7,
-     max(case when right(rn::varchar(10), 1) = '7' then upgrade_name end) as upgrade_name_7,
-     max(case when right(rn::varchar(10), 1) = '8' then upgrade_slot_type end) as upgrade_slot_type_8,
-     max(case when right(rn::varchar(10), 1) = '8' then upgrade_name end) as upgrade_name_8,
-     max(case when right(rn::varchar(10), 1) = '9' then upgrade_slot_type end) as upgrade_slot_type_9,
-     max(case when right(rn::varchar(10), 1) = '9' then upgrade_name end) as upgrade_name_9,
-     max(case when right(rn::varchar(10), 1) = '10' then upgrade_slot_type end) as upgrade_slot_type_10,
-     max(case when right(rn::varchar(10), 1) = '10' then upgrade_name end) as upgrade_name_10
-    from (
-        select
-         row_number() over (partition by planet_id order by upgrade_slot_id) as rn,
-         planet_id,
-         upgrade_slot_type,
-         upgrade_name
-        from planet_upgrades
-     ) t
-    group by 1
-  ) pu on p.planet_id = pu.planet_id
- left join (
-    select
-     planet_id,
-     max(case when type = 'artwork' then name end) as artwork,
-     max(case when type = 'music' then name end) as music,
-     max(case when type = 'lore' then name end) as lore
-    from planet_collectibles
-    group by 1
- ) pc on p.planet_id = pc.planet_id
-where po.owner = 'hxxxxx'
-order by p.generation, p.name
+ left join vw_planet_specials ps on p.planet_id = ps.planet_id
+ left join vw_planet_upgrades pu on p.planet_id = pu.planet_id
+ left join vw_planet_collectibles pc on p.planet_id = pc.planet_id;
 
 -- planet surveying - totals
+create or replace view vw_planet_owner_deposits_discovered_stats as
 select
+ po.owner,
+ po.owner_o,
  pdd.material_rarity,
  pdd.item_name,
  count(*) as total_count,
@@ -236,15 +261,14 @@ select
  sum(pdd.extracted_amount) as extracted_amount,
  sum(pdd.preparable_amount) as preparable_amount,
  sum(pdd.extractable_amount) as extractable_amount
-from planet_owners po
+from vw_planet_owners po
  join planets p on po.planet_id = p.planet_id
  join planet_deposits pd on p.planet_id = pd.planet_id
  join planet_deposits_discovered pdd on pd.planet_layer_id = pdd.planet_layer_id
-where po.owner = 'hxxxxx'
-group by 1,2
-order by 1,2;
+group by 1,2,3,4;
 
 -- planet surveying - discovered vs undiscovered
+create or replace view vw_planet_deposit_stats as
 select
  p.generation,
  pd.layer_number,
@@ -278,14 +302,16 @@ from planets p
      end as size
     from planet_deposits_discovered
  ) pdd on pd.planet_layer_id = pdd.planet_layer_id and s.size = pdd.size
-group by p.generation, pd.layer_number, s.size, s.rn
-order by p.generation, pd.layer_number, s.rn;
+group by p.generation, pd.layer_number, s.size, s.rn;
 
 -- planet surveying - list
+create or replace view vw_planet_owner_deposits_overview as
 select
+ po.owner,
+ po.owner_o,
  p.planet_id,
  p.generation,
- p.name,
+ p.name as planet_name,
  pd.layer_number,
  s.size,
  pdd.item_name,
@@ -294,7 +320,7 @@ select
  pdd.extracted_amount,
  pdd.preparable_amount,
  pdd.extractable_amount
-from planet_owners po
+from vw_planet_owners po
  join planets p on po.planet_id = p.planet_id
  join planet_deposits pd on p.planet_id = pd.planet_id
  cross join (
@@ -319,21 +345,25 @@ from planet_owners po
        when total_amount >= 4000 then 'large'
      end as size
     from planet_deposits_discovered
- ) pdd on pd.planet_layer_id = pdd.planet_layer_id and s.size = pdd.size
-where po.owner = 'hxxxxx'
-order by p.generation, p.name, pd.layer_number, s.rn;
+ ) pdd on pd.planet_layer_id = pdd.planet_layer_id and s.size = pdd.size;
 
 -- materials - list
-select distinct item_id, material_rarity, item_name
-from planet_deposits_discovered
-order by 2,3
+create or replace view vw_material_list as
+select distinct
+ item_id,
+ material_rarity,
+ item_name as material_name
+from planet_deposits_discovered;
 
 -- probes
+create or replace view vw_planet_owner_deposit_probes_stats as
 with cte_probes as (
     select
-     p.id,
+     po.owner,
+     po.owner_o,
+     p.id as probe_rn,
      p.material_rarity,
-     p.item_name,
+     p.item_name as material_name,
      p.workshop,
      p.probe,
      p.build_time,
@@ -346,12 +376,12 @@ with cte_probes as (
      sum(extracted_amount) as extracted_total
     from probes p
      join planet_deposits_discovered pdd on p.item_id = pdd.item_id
-     join planet_owners po on pdd.planet_id = po.planet_id
-    where po.owner = 'hxxxxx'
-    group by 1,2,3,4,5,6
+     join vw_planet_owners po on pdd.planet_id = po.planet_id
+    group by 1,2,3,4,5,6,7,8
 )
 select
- material_rarity, item_name, workshop, probe, build_time,
+ owner, owner_o,
+ probe_rn, material_rarity, material_name, workshop, probe, build_time,
  in_s, in_m, in_l, in_total,
  in_s * 5 as need_s,
  in_m * 8 as need_m,
@@ -359,6 +389,4 @@ select
  in_s * 5 + in_m * 8 + in_l * 10 as need_total,
  (in_s * 5 + in_m * 8 + in_l * 10) * build_time as build_time_total,
  discovered_total, prepared_total, extracted_total
-from cte_probes
-order by id;
-
+from cte_probes;

@@ -1,5 +1,5 @@
 create or replace view vw_unique_owners as
-select distinct owner
+select distinct t.owner
 from (
     select owner from planet_owners
     union all
