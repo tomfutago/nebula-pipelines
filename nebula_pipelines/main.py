@@ -183,7 +183,7 @@ def send_log_to_webhook(block_height: int, txHash: str, error: str):
 def pull_planet_data():
     # retrieve total supply of tokens and convert hex result to int
     #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
-    totalSupply = 7000 # temp setting as total doesnt match result from the call ^
+    totalSupply = 12500 # temp setting as total doesnt match result from the call ^
     planet_list = []
     planet_upgrade_list = []
     planet_specials_list = []
@@ -366,7 +366,7 @@ def pull_planet_owners():
 
     # retrieve total supply of tokens and convert hex result to int
     #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
-    totalSupply = 7000 # replace with sqlalchemy view listing all pulled tokenIDs
+    totalSupply = 12500 # replace with sqlalchemy view listing all pulled tokenIDs
     # retrieve current owners
     planet_owner_list = []
 
@@ -752,10 +752,10 @@ def pull_nebula_txns():
 
 
 ############################################
-#pull_planet_data()
-#pull_planet_owners()
+pull_planet_data()
+pull_planet_owners()
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
-pull_item_owners()
+#pull_item_owners()
 #pull_nebula_txns()

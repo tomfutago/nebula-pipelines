@@ -1,3 +1,7 @@
+/*
+drop view if exists vw_planet_owner_deposits_discovered_stats;
+*/
+
 -- planet owners
 create or replace view vw_planet_owners as
 select
@@ -16,8 +20,8 @@ from planets p
  join vw_planet_owners po on p.planet_id = po.planet_id
 group by 1,2;
 
--- planet owners + total count per rarity
-create or replace view vw_planet_owner_stats_per_rarity as
+-- planet owners + rarity pivot stats
+create or replace view vw_planet_owner_rarity_pivot_stats as
 select
  po.owner,
  po.owner_o,
@@ -31,8 +35,19 @@ from planets p
  join vw_planet_owners po on p.planet_id = po.planet_id
 group by 1,2;
 
--- planet owners + total count per type
-create or replace view vw_planet_owner_stats_per_type as
+-- planet owners + rarity list stats
+create or replace view vw_planet_owner_rarity_list_stats as
+select
+ po.owner,
+ po.owner_o,
+ p.rarity,
+ count(*) as planet_count
+from planets p
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2,3;
+
+-- planet owners + type pivot stats
+create or replace view vw_planet_owner_type_pivot_stats as
 select
  po.owner,
  po.owner_o,
@@ -49,8 +64,19 @@ from planets p
  join vw_planet_owners po on p.planet_id = po.planet_id
 group by 1,2;
 
+-- planet owners + type list stats
+create or replace view vw_planet_owner_type_list_stats as
+select
+ po.owner,
+ po.owner_o,
+ p.type,
+ count(*) as planet_count
+from planets p
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2,3;
+
 -- planets per region and sector
-create or replace view vw_planets_per_region_and_sector as
+create or replace view vw_planet_region_sector_stats as
 select
  region,
  sector,
@@ -59,7 +85,7 @@ from planets
 group by 1,2;
 
 -- planet specials - generic stats
-create or replace view vw_planet_global_specials_per_gen as
+create or replace view vw_planet_gen_special_stats as
 select
  p.generation,
  ps.name as special_name,
@@ -249,7 +275,7 @@ from vw_planet_owners po
  left join vw_planet_collectibles pc on p.planet_id = pc.planet_id;
 
 -- planet surveying - totals
-create or replace view vw_planet_owner_deposits_discovered_stats as
+create or replace view vw_planet_owner_deposit_discovered_stats as
 select
  po.owner,
  po.owner_o,
