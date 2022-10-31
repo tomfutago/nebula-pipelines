@@ -196,7 +196,7 @@ create table if not exists trxn (
     timestamp bigint not null,
     from_address varchar(50) not null,
     to_address varchar(50) not null,
-    value numeric(50,0) not null,
+    value numeric(50,10) not null,
     data_method varchar(100) null,
     data_params varchar(1000) null,
     data_type varchar(50) not null,

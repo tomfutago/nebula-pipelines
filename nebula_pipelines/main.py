@@ -53,6 +53,12 @@ def dict_to_str(d):
     except:
         return None
 
+def loop_to_numeric(v):
+    try:
+        return v / 10 ** 18
+    except:
+        return None
+
 def int_to_roman(number: int) -> str:
     num_map = [(1000, 'M'), (900, 'CM'), (500, 'D'), (400, 'CD'), (100, 'C'), (90, 'XC'),
                (50, 'L'), (40, 'XL'), (10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]
@@ -565,7 +571,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [29338046,29338034,29338021,29338010,29337997,29337985,29337973,29337961,29337928,29337907]
+    #blocks = [33851433,33855859,33897062]
     #blocks.reverse()
 
 
@@ -608,12 +614,16 @@ def pull_nebula_txns():
                                 df_tx["idx"] = block_height * 100000000 + n # generated PK
                                 
                                 # fields requiring extra attention:
-                                if "value" not in df_tx:
+                                if "value" in df_tx:
+                                    df_tx["value"] = df_tx["value"].apply(loop_to_numeric) # convert loop to icx
+                                else:
                                     df_tx["value"] = 0
+                                
                                 if "data_params" in df_tx:
                                     df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
                                 else:
                                     df_tx["data_params"] = None
+                                
                                 if "data_content" not in df_tx:
                                     df_tx["data_contentType"] = None
                                     df_tx["data_content"] = None
@@ -740,22 +750,22 @@ def pull_nebula_txns():
                             except:
                                 #send to log webhook
                                 err_msg = "{}. {}, line: {}".format(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2].tb_lineno)
-                                print(err_msg)
+                                #print(err_msg)
                                 send_log_to_webhook(block_height, tx["txHash"], err_msg)
-                                #continue
-                                break
+                                continue
+                                #break
                 block_height += 1
             except:
                 sleep(2)
-                #continue
-                break
+                continue
+                #break
 
 
 ############################################
-pull_planet_data()
-pull_planet_owners()
+#pull_planet_data()
+#pull_planet_owners()
 #pull_ship_data()
 #pull_ship_owners()
 #pull_item_data()
 #pull_item_owners()
-#pull_nebula_txns()
+pull_nebula_txns()
