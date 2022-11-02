@@ -46,6 +46,34 @@ from planets p
  join vw_planet_owners po on p.planet_id = po.planet_id
 group by 1,2,3;
 
+-- planet owners + gen rarity pivot stats
+create or replace view vw_planet_owner_gen_rarity_pivot_stats as
+select
+ po.owner,
+ po.owner_o,
+ p.generation,
+ sum(case when p.rarity = 'common' then 1 else 0 end) as common,
+ sum(case when p.rarity = 'uncommon' then 1 else 0 end) as uncommon,
+ sum(case when p.rarity = 'rare' then 1 else 0 end) as rare,
+ sum(case when p.rarity = 'legendary' then 1 else 0 end) as legendary,
+ sum(case when p.rarity = 'mythic' then 1 else 0 end) as mythic,
+ count(*) as planet_count
+from planets p
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2,3;
+
+-- planet owners + gen rarity list stats
+create or replace view vw_planet_owner_gen_rarity_list_stats as
+select
+ po.owner,
+ po.owner_o,
+ p.generation,
+ p.rarity,
+ count(*) as planet_count
+from planets p
+ join vw_planet_owners po on p.planet_id = po.planet_id
+group by 1,2,3,4;
+
 -- planet owners + type pivot stats
 create or replace view vw_planet_owner_type_pivot_stats as
 select
@@ -210,6 +238,43 @@ from vw_planet_owners po
  join vw_planet_upgrades pu on po.planet_id = pu.planet_id
  join planets p on pu.planet_id = p.planet_id;
 
+-- planet upgrades with suggestions
+create or replace view vw_planet_owner_upgrades_suggested as
+select
+ po.owner,
+ po.owner_o,
+ po.planet_id,
+ p.name as planet_name,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
+ p.type as planet_type,
+ pu.upgrade_slot_type,
+ pu.upgrade_name,
+ u.upgrade_type,
+ u.upgrade_effect,
+ u.upgrade_by_units,
+ su.upgrade_name as suggested_upgrade_name,
+ su.upgrade_by_units as suggested_upgrade_by_units
+from vw_planet_owners po
+ join planets p on po.planet_id = p.planet_id
+ join planet_upgrades pu on po.planet_id = pu.planet_id
+ left join upgrades u
+   on p.type = u.planet_type
+  and pu.upgrade_slot_type = u.upgrade_slot_type
+  and pu.upgrade_name = u.upgrade_name
+ left join lateral (
+    select
+     up.upgrade_name,
+     up.upgrade_by_units
+    from upgrades up
+    where u.planet_type = up.planet_type
+     and u.upgrade_slot_type = up.upgrade_slot_type
+     and u.upgrade_type = up.upgrade_type
+     and u.upgrade_effect = up.upgrade_effect
+     and u.upgrade_by_units < up.upgrade_by_units
+    order by up.upgrade_by_units
+    limit 1
+  ) su on true;
+
 -- planet collectibles
 create or replace view vw_planet_owner_collectibles as
 select
@@ -233,7 +298,8 @@ select
  p.generation,
  p.sector,
  p.region,
- concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_name,
+ p.name as planet_name,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
  p.type,
  p.rarity,
  p.credits,
@@ -273,6 +339,34 @@ from vw_planet_owners po
  left join vw_planet_specials ps on p.planet_id = ps.planet_id
  left join vw_planet_upgrades pu on p.planet_id = pu.planet_id
  left join vw_planet_collectibles pc on p.planet_id = pc.planet_id;
+
+-- planet fun facts
+create or replace view vw_planet_owner_fun_facts as
+with ff_cte as (
+  select
+   po.owner,
+   po.owner_o,
+   p.name as planet_name,
+   p.moons,
+   row_number() over (partition by po.owner order by p.moons desc) as rn_moon,
+   p.temperature,
+   row_number() over (partition by po.owner order by p.temperature) as rn_temp_low,
+   row_number() over (partition by po.owner order by p.temperature desc) as rn_temp_high,
+   p.radius,
+   row_number() over (partition by po.owner order by p.radius desc) as rn_radius,
+   p.mass,
+   row_number() over (partition by po.owner order by p.mass::numeric(50,5) desc) as rn_mass,
+   p.gravity,
+   row_number() over (partition by po.owner order by p.gravity::numeric(30,5) desc) as rn_gravity
+  from vw_planet_owners po
+   join planets p on po.planet_id = p.planet_id
+)
+select owner, owner_o, concat('most moons - ', planet_name, ': ', moons) as description from ff_cte where rn_moon = 1 union
+select owner, owner_o, concat('lowest temp on ', planet_name, ': ', temperature) as description from ff_cte where rn_temp_low = 1 union
+select owner, owner_o, concat('highest temp on ', planet_name, ': ', temperature) as description from ff_cte where rn_temp_high = 1 union
+select owner, owner_o, concat('largest radius - ', planet_name, ': ', radius) as description from ff_cte where rn_radius = 1 union
+select owner, owner_o, concat('biggest mass - ', planet_name, ': ', mass) as description from ff_cte where rn_mass = 1 union
+select owner, owner_o, concat('greatest gravity - ', planet_name, ': ', gravity) as description from ff_cte where rn_gravity = 1;
 
 -- planet surveying - totals
 create or replace view vw_planet_owner_deposit_discovered_stats as
