@@ -346,7 +346,7 @@ with ff_cte as (
   select
    po.owner,
    po.owner_o,
-   p.name as planet_name,
+   concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
    p.moons,
    row_number() over (partition by po.owner order by p.moons desc) as rn_moon,
    p.temperature,
@@ -361,12 +361,12 @@ with ff_cte as (
   from vw_planet_owners po
    join planets p on po.planet_id = p.planet_id
 )
-select owner, owner_o, concat('most moons - ', planet_name, ': ', moons) as description from ff_cte where rn_moon = 1 union
-select owner, owner_o, concat('lowest temp on ', planet_name, ': ', temperature) as description from ff_cte where rn_temp_low = 1 union
-select owner, owner_o, concat('highest temp on ', planet_name, ': ', temperature) as description from ff_cte where rn_temp_high = 1 union
-select owner, owner_o, concat('largest radius - ', planet_name, ': ', radius) as description from ff_cte where rn_radius = 1 union
-select owner, owner_o, concat('biggest mass - ', planet_name, ': ', mass) as description from ff_cte where rn_mass = 1 union
-select owner, owner_o, concat('greatest gravity - ', planet_name, ': ', gravity) as description from ff_cte where rn_gravity = 1;
+select 1 as rn, owner, owner_o, concat('most moons - ', planet_link, ': ', moons) as description from ff_cte where rn_moon = 1 union
+select 2, owner, owner_o, concat('lowest temp on ', planet_link, ': ', temperature, '°C') from ff_cte where rn_temp_low = 1 union
+select 3, owner, owner_o, concat('highest temp on ', planet_link, ': ', temperature, '°C') from ff_cte where rn_temp_high = 1 union
+select 4, owner, owner_o, concat('largest radius - ', planet_link, ': ', radius, 'km') from ff_cte where rn_radius = 1 union
+select 5, owner, owner_o, concat('biggest mass - ', planet_link, ': ', mass, 'kg') from ff_cte where rn_mass = 1 union
+select 6, owner, owner_o, concat('greatest gravity - ', planet_link, ': ', gravity, 'm/s^2') from ff_cte where rn_gravity = 1;
 
 -- planet surveying - totals
 create or replace view vw_planet_owner_deposit_discovered_stats as

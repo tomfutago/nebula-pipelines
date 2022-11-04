@@ -481,7 +481,7 @@ def pull_ship_owners():
         # write to db in batches per 1000 records
         if tokenId % 1000 == 0 or tokenId == totalSupply:
             df_ship_owners = pd.DataFrame(ship_owner_list, columns=["ship_id","owner"])
-            df_ship_owners.to_csv("./tests/samples/ship_owners.csv", index=False)
+            #df_ship_owners.to_csv("./tests/samples/ship_owners.csv", index=False)
 
             # prep and upsert data
             data_transform_and_load(
@@ -515,7 +515,7 @@ def pull_item_data():
 
     # -----------------------
     df_items = pd.concat(item_list)
-    df_items.to_csv("./tests/samples/items.csv", index=False)
+    #df_items.to_csv("./tests/samples/items.csv", index=False)
 
     # prep and upsert data
     data_transform_and_load(
@@ -552,7 +552,7 @@ def pull_item_owners():
 
             # write to db
             df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"])
-            df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
+            #df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
 
             # prep and upsert data
             data_transform_and_load(
@@ -632,7 +632,7 @@ def pull_nebula_txns():
 
                                 # -----------------------
                                 df_txns = pd.concat(tx_list)
-                                df_txns.to_csv("./tests/samples/txns.csv", index=False)
+                                #df_txns.to_csv("./tests/samples/txns.csv", index=False)
 
                                 # prep and upsert data
                                 data_transform_and_load(
@@ -685,7 +685,7 @@ def pull_nebula_txns():
                                 
                                     # -----------------------
                                     df_tx_data = pd.concat(tx_data_list)
-                                    df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+                                    #df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
 
                                     # prep and upsert data
                                     data_transform_and_load(
@@ -727,7 +727,7 @@ def pull_nebula_txns():
 
                                     # -----------------------
                                     df_tx_events = pd.concat(tx_event_list)
-                                    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+                                    #df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
 
                                     # prep and upsert data
                                     data_transform_and_load(
