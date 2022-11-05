@@ -1,2 +1,2 @@
 method,params__token_id,block_height,txHash,tokenId,params__to,params__tokenId,params__orderId,params__amount,params__price,params__starting_price,params__duration_in_hours,params__address,params__token_URI,params_txHash,params__id,params__from,params__value,params__owner,params__ids,params__amounts,params__transferId,idx
-purchase_token,0x3a9,30578653,0x23bbfa434ee84f7ab484e2472ca18dbf552ddec8ea020b98004fa1d9a84c80d8,937,,,,,,,,,,,,,,,,,,3057865300000001
+place_bid,0x344,33897062,0xfc6a058143e080aa8f3a39ec6b9d6c55709ac2bd54a864ffbd9ccfabb245216e,836,,,,,,,,,,,,,,,,,,3389706200000001
