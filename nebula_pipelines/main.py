@@ -70,6 +70,7 @@ def int_to_roman(number: int) -> str:
             break
     return "".join(result)
 
+
 # icon service call
 def call(to, method, params):
     call = CallBuilder().to(to).method(method).params(params).build()
@@ -527,6 +528,45 @@ def pull_item_data():
         extra_update_fields={"updated_at": "NOW()"}
     )
 
+def pull_blocks_history(data_type: str, address: str):    
+    #truncate_table("blocks_history")
+    n = 0
+    blocks_history_list = []
+
+    while True:
+        print("pull page progress:", n)
+
+        api_url = f"https://tracker.icon.community/api/v1/transactions/address/{address}?limit=100&skip={n}"
+        api_response = requests.get(api_url)
+
+        if api_response.status_code != 200:
+            print("Unprocessable request")
+            break
+
+        if not "block_number" in api_response.text:
+            print("empty")
+            break
+
+        for t in api_response.json():
+            #print(t["block_number"])
+            blocks_history_list.append([data_type, t["block_number"]])
+
+        # write to db
+        df_blocks_history = pd.DataFrame(blocks_history_list, columns=["data_type","block_number"])
+        df_blocks_history = df_blocks_history.drop_duplicates()
+        #df_blocks_history.to_csv("./tests/samples/blocks_history.csv", index=False)
+
+        # prep and upsert data
+        data_transform_and_load(
+            df_to_load=df_blocks_history,
+            table_name="blocks_history",
+            list_of_col_names=[
+                "data_type","block_number"
+            ]
+        )
+
+        n += 100
+
 
 ############################################
 def pull_item_owners():
@@ -574,11 +614,14 @@ def pull_nebula_txns():
     #blocks = [33851433,33855859,33897062]
     #blocks.reverse()
 
-
-    #block_height = 25353586 # first mint
-    #block_height = 30593390 # last stop
+    # loop through historical blocks
+    sql = f"select distinct block_number from blocks_history where block_number >= {block_height} order by block_number;"
+    conn = db_engine.connect()
+    query_results = conn.execute(statement=sql)
+    for row in query_results:
+        block_height = row.block_number
     
-    while True:
+    #while True:
     #while block_height == 56861361:
     #for block_height in blocks:
         try:
@@ -754,7 +797,7 @@ def pull_nebula_txns():
                                 send_log_to_webhook(block_height, tx["txHash"], err_msg)
                                 continue
                                 #break
-                block_height += 1
+                #block_height += 1
             except:
                 sleep(2)
                 continue
@@ -768,4 +811,10 @@ def pull_nebula_txns():
 #pull_ship_owners()
 #pull_item_data()
 #pull_item_owners()
+
+#pull_blocks_history(data_type="planet", address=NebulaPlanetTokenCx)
+#pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
+#pull_blocks_history(data_type="ship", address=NebulaSpaceshipTokenCx)
+#pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
+
 pull_nebula_txns()

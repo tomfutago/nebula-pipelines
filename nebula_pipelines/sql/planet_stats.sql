@@ -275,19 +275,35 @@ from vw_planet_owners po
     limit 1
   ) su on true;
 
--- planet collectibles
+-- collectibles - list
+create or replace view vw_collectibles as
+select distinct p.generation, pc.collection_id, pc.type, pc.name, pc.title, pc.author, pc.pieces, pc.total_copies
+from planet_collectibles pc
+ join planets p on pc.planet_id = p.planet_id;
+
+-- planet owner - collectible list
 create or replace view vw_planet_owner_collectibles as
 select
  po.owner,
  po.owner_o,
  po.planet_id,
+ p.generation,
  p.name as planet_name,
- pc.artwork,
- pc.music,
- pc.lore
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
+ pc.collection_id,
+ pc.type,
+ pc.name,
+ pc.title,
+ pc.author,
+ pc.pieces,
+ pc.total_copies,
+ pc.item_number,
+ pc.copy_number,
+ pc.collectible_image,
+ concat('"', pc.name, '" (Part ', ltrim(to_char(pc.item_number, 'RN')), ') #', pc.copy_number, ' out of ', pc.total_copies, ' copies') as collectible_description
 from vw_planet_owners po
- join vw_planet_collectibles pc on po.planet_id = pc.planet_id
- join planets p on pc.planet_id = p.planet_id;
+ join planets p on po.planet_id = p.planet_id
+ join planet_collectibles pc on p.planet_id = pc.planet_id;
 
 -- planets overview per address
 create or replace view vw_planet_owner_overview as
