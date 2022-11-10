@@ -178,11 +178,9 @@ def send_log_to_webhook(block_height: int, txHash: str, error: str):
     err_msg += "\ntxHash: " + txHash
     err_msg += "\nERROR: " + error
     err_msg += "\n"
-    print("1..")
+    err_msg = err_msg[:1000] # truncate long error msg to first 1000 chars
     webhook = DiscordWebhook(url=discord_log_webhook, rate_limit_retry=True, content=err_msg)
-    print("2..")
     response = webhook.execute()
-    print("3..")
     return response
 
 
@@ -616,7 +614,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [33851433,33855859,33897062]
+    #blocks = [55642865,55643218,55703406,55703409,55703413,55703761,55733447]
     #blocks.reverse()
 
     # loop through historical blocks
