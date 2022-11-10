@@ -368,9 +368,6 @@ def pull_planet_data():
 
 ############################################
 def pull_planet_owners():
-    # flush table before filling it again
-    truncate_table("planet_owners")
-
     # retrieve total supply of tokens and convert hex result to int
     #totalSupply = hex_to_int(call(NebulaPlanetTokenCx, "totalSupply", {}))
     totalSupply = 12000 # replace with sqlalchemy view listing all pulled tokenIDs
@@ -387,20 +384,25 @@ def pull_planet_owners():
             # likely reason: >> SCOREError(-30032): E0032:Invalid _tokenId. NFT is burned
             pass
 
-        # write to db in batches per 1000 records
-        if tokenId % 1000 == 0 or tokenId == totalSupply:
-            df_planet_owners = pd.DataFrame(planet_owner_list, columns=["planet_id","owner"])
-            #df_planet_owners.to_csv("./tests/samples/owners.csv", index=False)
+    # write to db in batches per 1000 records
+    #if tokenId % 1000 == 0 or tokenId == totalSupply:
+    #    pass
 
-            # prep and upsert data
-            data_transform_and_load(
-                df_to_load=df_planet_owners,
-                table_name="planet_owners",
-                list_of_col_names=[
-                    "planet_id","owner"
-                ],
-                extra_update_fields={"updated_at": "NOW()"}
-            )
+    # flush table before filling it again
+    truncate_table("planet_owners")
+    
+    df_planet_owners = pd.DataFrame(planet_owner_list, columns=["planet_id","owner"])
+    #df_planet_owners.to_csv("./tests/samples/owners.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_planet_owners,
+        table_name="planet_owners",
+        list_of_col_names=[
+            "planet_id","owner"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
 
 ############################################
@@ -462,9 +464,6 @@ def pull_ship_data():
 
 ############################################
 def pull_ship_owners():
-    # flush table before filling it again
-    truncate_table("ship_owners")
-
     # retrieve total supply of tokens and convert hex result to int
     totalSupply = hex_to_int(call(NebulaSpaceshipTokenCx, "totalSupply", {}))
     # retrieve current owners
@@ -479,20 +478,25 @@ def pull_ship_owners():
         print(tokenId, ":", owner)
         ship_owner_list.append([tokenId, owner])
 
-        # write to db in batches per 1000 records
-        if tokenId % 1000 == 0 or tokenId == totalSupply:
-            df_ship_owners = pd.DataFrame(ship_owner_list, columns=["ship_id","owner"])
-            #df_ship_owners.to_csv("./tests/samples/ship_owners.csv", index=False)
+    # write to db in batches per 1000 records
+    #if tokenId % 1000 == 0 or tokenId == totalSupply:
+    #    pass
 
-            # prep and upsert data
-            data_transform_and_load(
-                df_to_load=df_ship_owners,
-                table_name="ship_owners",
-                list_of_col_names=[
-                    "ship_id","owner"
-                ],
-                extra_update_fields={"updated_at": "NOW()"}
-            )
+    # flush table before filling it again
+    truncate_table("ship_owners")
+
+    df_ship_owners = pd.DataFrame(ship_owner_list, columns=["ship_id","owner"])
+    #df_ship_owners.to_csv("./tests/samples/ship_owners.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_ship_owners,
+        table_name="ship_owners",
+        list_of_col_names=[
+            "ship_id","owner"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
 
 ############################################
@@ -570,15 +574,13 @@ def pull_blocks_history(data_type: str, address: str):
 
 ############################################
 def pull_item_owners():
-    # flush table before filling it again
-    truncate_table("item_owners")
+    item_owner_list = []
     
     # loop through unique list of wallets based on planet and ship owners
     sql = "select owner from vw_unique_owners;"
     with db_engine.connect() as conn:
         query_results = conn.execute(statement=sql)
         for row in query_results:
-            item_owner_list = []
             print(row.owner)
             
             try:
@@ -590,19 +592,22 @@ def pull_item_owners():
                 print(hex_to_int(i[0]), ":", hex_to_int(i[1]))
                 item_owner_list.append([hex_to_int(i[0]), row.owner, hex_to_int(i[1])])
 
-            # write to db
-            df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"])
-            #df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
+    # flush table before filling it again
+    truncate_table("item_owners")
 
-            # prep and upsert data
-            data_transform_and_load(
-                df_to_load=df_item_owners,
-                table_name="item_owners",
-                list_of_col_names=[
-                    "item_id","owner","total"
-                ],
-                extra_update_fields={"updated_at": "NOW()"}
-            )
+    # write to db
+    df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"])
+    #df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_item_owners,
+        table_name="item_owners",
+        list_of_col_names=[
+            "item_id","owner","total"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
 
 
 ############################################
@@ -622,7 +627,6 @@ def pull_nebula_txns():
         block_height = row.block_number
     
     #while True:
-    #while block_height == 56861361:
     #for block_height in blocks:
         try:
             block = icon_service.get_block(block_height)
@@ -679,7 +683,7 @@ def pull_nebula_txns():
 
                                 # prep and upsert data
                                 data_transform_and_load(
-                                    df_to_load=df_tx,
+                                    df_to_load=df_txns,
                                     table_name="trxn",
                                     list_of_col_names=[
                                         "tx_id", "tx_hash","block_height","timestamp","from_address","to_address","value","data_method",
@@ -797,7 +801,7 @@ def pull_nebula_txns():
                                 send_log_to_webhook(block_height, tx["txHash"], err_msg)
                                 continue
                                 #break
-                #block_height += 1
+                block_height += 1
             except:
                 sleep(2)
                 continue
