@@ -611,11 +611,13 @@ def pull_item_owners():
 ############################################
 def pull_nebula_txns():
     # latest block height
-    block_height = get_table_max_val(table_name="trxn", column_name="block_height")
+    #block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
     #blocks = [55642865,55643218,55703406,55703409,55703413,55703761,55733447]
     #blocks.reverse()
+
+    block_height = 45422500 # pre-multi-token to re-run
 
     # loop through historical blocks
     sql = f"select distinct block_number from blocks_history where block_number >= {block_height} order by block_number;"
