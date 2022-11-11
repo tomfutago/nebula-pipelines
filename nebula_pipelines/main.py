@@ -178,6 +178,7 @@ def send_log_to_webhook(block_height: int, txHash: str, error: str):
     err_msg += "\ntxHash: " + txHash
     err_msg += "\nERROR: " + error
     err_msg += "\n"
+    print(err_msg)
     err_msg = err_msg[:1000] # truncate long error msg to first 1000 chars
     webhook = DiscordWebhook(url=discord_log_webhook, rate_limit_retry=True, content=err_msg)
     response = webhook.execute()
@@ -614,10 +615,10 @@ def pull_nebula_txns():
     #block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [55642865,55643218,55703406,55703409,55703413,55703761,55733447]
+    #blocks = [57633618,57673694]
     #blocks.reverse()
 
-    block_height = 45422500 # pre-multi-token to re-run
+    block_height = 57633618 # deposit without data_type
 
     # loop through historical blocks
     sql = f"select distinct block_number from blocks_history where block_number >= {block_height} order by block_number;"

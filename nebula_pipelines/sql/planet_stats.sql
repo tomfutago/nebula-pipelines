@@ -403,6 +403,23 @@ from vw_planet_owners po
  join planet_deposits_discovered pdd on pd.planet_layer_id = pdd.planet_layer_id
 group by 1,2,3,4;
 
+create or replace view vw_planet_owner_deposit_undiscovered_stats as
+select
+ pos.owner,
+ pos.owner_o,
+ pos.planet_count,
+ pd.layer_number,
+ pdu.size,
+ concat(upper(left(pdu.size,1)), '-L', pd.layer_number) as slot_type,
+ pos.planet_count - count(*) as deposits_discovered,
+ count(*) as deposits_undiscovered
+from vw_planet_owner_stats pos
+ join vw_planet_owners po on pos.owner = po.owner
+ join planets p on po.planet_id = p.planet_id
+ join planet_deposits pd on p.planet_id = pd.planet_id
+ join planet_deposits_undiscovered pdu on pd.planet_layer_id = pdu.planet_layer_id
+group by 1,2,3,4,5,6;
+
 -- planet surveying - discovered vs undiscovered
 create or replace view vw_planet_deposit_stats as
 select

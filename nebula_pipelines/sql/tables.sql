@@ -199,7 +199,7 @@ create table if not exists trxn (
     value numeric(50,10) not null,
     data_method varchar(100) null,
     data_params varchar(1000) null,
-    data_type varchar(50) not null,
+    data_type varchar(50) null,
     nid integer null,
     nonce smallint null,
     step_limit bigint not null,
