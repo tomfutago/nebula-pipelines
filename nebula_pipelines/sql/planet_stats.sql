@@ -411,7 +411,7 @@ select
  pd.layer_number,
  pdu.size,
  concat(upper(left(pdu.size,1)), '-L', pd.layer_number) as slot_type,
- pos.planet_count - count(*) as deposits_discovered,
+ pos.planet_count - count(*) as deposits_discovered, -- incorrect, no way to know how many extra deposits discovered per size
  count(*) as deposits_undiscovered
 from vw_planet_owner_stats pos
  join vw_planet_owners po on pos.owner = po.owner
