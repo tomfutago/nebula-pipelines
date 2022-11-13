@@ -28,3 +28,51 @@ where data_method in (
 
 -- purchase token
 select * from trxn_events where block_height = 25828615;
+
+
+
+-- test
+--create index idx_trxn_events_blockheight_txhash on trxn_events(block_height, tx_hash);
+
+/*
+select x'3cc878365ce6bd0000'::bit(18)::bigint
+select x'deadbeefdeadbeefdeadbeef'::bit(24)::text;
+select x'deadbeef'::bit(16)::bigint;
+*/
+
+select t.tx_id, t.block_height, t.data_method, t.value, t.from_address, tr.*
+ --count(distinct t.tx_id) as tx_count, count(*) ev_count
+from trxn t
+ join trxn_data td on t.tx_id = td.tx_data_id
+ left join lateral (
+   select
+    te.indexed,
+    split_part(te.indexed, ',', 5) as address,
+    trim(trailing '}' from split_part(te.indexed, ',', 6)) as price_hex
+    --('x' || lpad(trim(leading '0x' from trim(trailing '}' from split_part(te.indexed, ',', 6))), 32, '0'))::bit(64)::bigint as price_loop
+   from trxn_events te
+   where t.block_height = te.block_height
+    and t.tx_hash = te.tx_hash
+    and te.indexed like '%"ICXTransfer(Address,Address,int)"%'
+    --and te.indexed like '%"ICXTransfer(Address,Address,int)",cx57d7acf8b5114b787ecdd99ca460c2272e4d9135,cx57d7acf8b5114b787ecdd99ca460c2272e4d9135,%'
+  ) a on true
+ left join lateral (
+   select
+    te.indexed,
+    split_part(te.indexed, ',', 4) as seller,
+    split_part(te.indexed, ',', 5) as buyer
+   from trxn_events te
+   where t.block_height = te.block_height
+    and t.tx_hash = te.tx_hash
+    and te.indexed like '%"Transfer(Address,Address,int)"%'
+  ) tr on true
+where t.to_address = 'cx57d7acf8b5114b787ecdd99ca460c2272e4d9135' -- planets
+ and t.data_method in (
+    --'create_auction', 'place_bid', 'return_unsold_item', 
+    --'list_token', 'delist_token', 
+    --'purchase_token'
+    'finalize_auction'
+  )
+order by 1 desc
+--group by 1,2
+--order by 4 desc
