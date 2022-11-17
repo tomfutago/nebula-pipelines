@@ -364,6 +364,15 @@ def pull_planet_data():
                 extra_update_fields={"updated_at": "NOW()"}
             )
 
+            # reset lists
+            planet_list = []
+            planet_upgrade_list = []
+            planet_specials_list = []
+            planet_collectibles_list = []
+            planet_deposit_list = []
+            planet_deposit_discovered_list = []
+            planet_deposit_undiscovered_list = []
+
 
 ############################################
 def pull_planet_owners():
@@ -459,6 +468,10 @@ def pull_ship_data():
                 ],
                 extra_update_fields={"updated_at": "NOW()"}
             )
+
+            # reset lists
+            ship_list = []
+            ship_ability_list = []
 
 
 ############################################
@@ -615,7 +628,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [57633618,57673694]
+    #blocks = [58048895]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type

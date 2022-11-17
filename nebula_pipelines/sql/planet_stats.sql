@@ -2,6 +2,23 @@
 drop view if exists vw_planet_owner_deposits_discovered_stats;
 */
 
+-- planets
+create or replace view vw_planets as
+select
+ p.planet_id,
+ p.generation,
+ p.sector,
+ p.region,
+ p.name as planet_name,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
+ p.type,
+ p.rarity,
+ p.credits,
+ p.industry,
+ p.research,
+ concat('<a href="', p.image, '" target="_blank" >', p.name, '.png</a>') as image_url
+from planets p;
+
 -- planet owners
 create or replace view vw_planet_owners as
 select
@@ -543,3 +560,99 @@ select
  (in_s * 5 + in_m * 8 + in_l * 10) * build_time as build_time_total,
  discovered_total, prepared_total, extracted_total
 from cte_probes;
+
+-- planet trades
+create or replace view vw_planet_trades as
+with auction as (
+  select
+   t.tx_id, 
+   to_timestamp(t.timestamp/1000000)::timestamp as block_dt,
+   td.token_id, 
+   t.data_method,
+   t.value,
+   lead(t.from_address) over (
+       partition by
+        td.token_id,
+        case when t.data_method = 'create_auction' then 'finalize_auction' else t.data_method end
+       order by t.tx_id desc
+    ) as create_auction_address,
+   lead(t.value) over (partition by td.token_id order by t.tx_id desc) as prev_value,
+   t.from_address, 
+   lead(t.from_address) over (partition by td.token_id order by t.tx_id desc) as prev_address,
+   --td.params__starting_price, td.params__duration_in_hours,
+   t.tx_hash
+  from trxn t
+   join trxn_data td on t.tx_id = td.tx_data_id
+  where t.to_address = 'cx57d7acf8b5114b787ecdd99ca460c2272e4d9135' -- planets
+   and t.data_method in (
+      'create_auction', 'place_bid', 'finalize_auction' --, 'return_unsold_item'
+    )
+),
+set_price as (
+  select
+   t.tx_id, 
+   to_timestamp(t.timestamp/1000000)::timestamp as block_dt,
+   td.token_id, 
+   t.data_method,
+   t.value,
+   t.from_address, 
+   lead(t.from_address) over (partition by td.token_id order by t.tx_id desc) as prev_address,
+   --td.params__price,
+   t.tx_hash
+  from trxn t
+   join trxn_data td on t.tx_id = td.tx_data_id
+  where t.to_address = 'cx57d7acf8b5114b787ecdd99ca460c2272e4d9135' -- planets
+   and t.data_method in (
+      'list_token', 'purchase_token' --, 'delist_token'
+    )
+)
+select
+ tx_id,
+ block_dt,
+ token_id as planet_id,
+ 'auction' as trade_type,
+ create_auction_address as seller,
+ prev_address as buyer,
+ prev_value as price,
+ tx_hash,
+ concat('<a href="https://tracker.icon.foundation/transaction/', tx_hash, '" target="_blank" >', tx_hash, '</a>') as tx_hash_link
+from auction
+where data_method = 'finalize_auction'
+union all
+select
+ tx_id,
+ block_dt,
+ token_id as planet_id,
+ 'set price' as trade_type,
+ prev_address as seller,
+ from_address as buyer,
+ value as price,
+ tx_hash,
+ concat('<a href="https://tracker.icon.foundation/transaction/', tx_hash, '" target="_blank" >', tx_hash, '</a>') as tx_hash_link
+from set_price
+where data_method = 'purchase_token'
+ and coalesce(value, 0) != 0;
+
+create or replace view vw_planet_detail_trades as
+select
+ pt.tx_id,
+ pt.block_dt,
+ pt.planet_id, 
+ p.generation,
+ p.sector,
+ p.region,
+ p.name as planet_name,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
+ p.type,
+ p.rarity,
+ p.credits,
+ p.industry,
+ p.research,
+ pt.trade_type,
+ pt.seller,
+ pt.buyer,
+ pt.price,
+ pt.tx_hash,
+ pt.tx_hash_link
+from vw_planet_trades pt
+ join planets p on pt.planet_id = p.planet_id;
