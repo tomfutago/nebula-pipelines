@@ -402,6 +402,21 @@ select 5, owner, owner_o, concat('biggest mass - ', planet_link, ': ', mass, 'kg
 select 6, owner, owner_o, concat('greatest gravity - ', planet_link, ': ', gravity, 'm/s^2') from ff_cte where rn_gravity = 1;
 
 -- planet surveying - totals
+create or replace view vw_planet_owner_deposit_stats as
+select
+ po.owner,
+ po.owner_o,
+ sum(case when pdu.planet_layer_id is not null then 1 else 0 end) as undiscovered_count,
+ sum(case when pdd.planet_layer_id is not null then 1 else 0 end) as discovered_count,
+ sum(case when pdd.prepared_amount = pdd.total_amount then 1 else 0 end) as prepared_count,
+ sum(case when pdd.extracted_amount = pdd.total_amount then 1 else 0 end) as extracted_count
+from vw_planet_owners po
+ join planets p on po.planet_id = p.planet_id
+ join planet_deposits pd on p.planet_id = pd.planet_id
+ left join planet_deposits_discovered pdd on pd.planet_layer_id = pdd.planet_layer_id
+ left join planet_deposits_undiscovered pdu on pd.planet_layer_id = pdu.planet_layer_id
+group by 1,2;
+
 create or replace view vw_planet_owner_deposit_discovered_stats as
 select
  po.owner,
