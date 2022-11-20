@@ -174,8 +174,10 @@ def truncate_table(table_name: str):
 # function for sending error msg to discord webhook
 def send_log_to_webhook(block_height: int, txHash: str, error: str):
     err_msg = "Nebula Pipelines log"
-    err_msg += "\nblock_height: " + str(block_height)
-    err_msg += "\ntxHash: " + txHash
+    if block_height != 0:
+        err_msg += "\nblock_height: " + str(block_height)
+    if txHash != "":
+        err_msg += "\ntxHash: " + txHash
     err_msg += "\nERROR: " + error
     err_msg += "\n"
     print(err_msg)
@@ -817,7 +819,6 @@ def pull_nebula_txns():
                             except:
                                 #send to log webhook
                                 err_msg = "{}. {}, line: {}".format(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2].tb_lineno)
-                                #print(err_msg)
                                 send_log_to_webhook(block_height, tx["txHash"], err_msg)
                                 continue
                                 #break
@@ -829,16 +830,28 @@ def pull_nebula_txns():
 
 
 ############################################
-#pull_planet_data()
-#pull_planet_owners()
-#pull_ship_data()
-#pull_ship_owners()
-#pull_item_data()
-#pull_item_owners()
+def pull_api_data():
+    while True:
+        try:
+            pull_planet_data()
+            pull_planet_owners()
+            pull_ship_data()
+            pull_ship_owners()
+            pull_item_data()
+            pull_item_owners()
+            sleep(600) # 10 minutes delay before next iteration
+        except:
+            #send to log webhook
+            err_msg = "{}. {}, line: {}".format(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2].tb_lineno)
+            send_log_to_webhook(block_height=0, txHash="", error=err_msg)
+            continue
 
+
+############################################
 #pull_blocks_history(data_type="planet", address=NebulaPlanetTokenCx)
 #pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
 #pull_blocks_history(data_type="ship", address=NebulaSpaceshipTokenCx)
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
 
-pull_nebula_txns()
+pull_api_data()
+#pull_nebula_txns()
