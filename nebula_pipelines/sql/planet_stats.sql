@@ -497,8 +497,12 @@ select
  p.planet_id,
  p.generation,
  p.name as planet_name,
+ concat('<a href="', p.external_link, '" target="_blank" >', p.name, '</a>') as planet_link,
+ p.rarity,
+ p.type,
  pd.layer_number,
- s.size,
+ coalesce(pdu.size, 'unknown') as size,
+ pdd.material_rarity,
  pdd.item_name,
  pdd.total_amount,
  pdd.prepared_amount,
@@ -508,29 +512,8 @@ select
 from vw_planet_owners po
  join planets p on po.planet_id = p.planet_id
  join planet_deposits pd on p.planet_id = pd.planet_id
- cross join (
-    select 1, 'small' union
-    select 2, 'medium' union
-    select 3, 'large'
-  ) s (rn, size)
- left join (
-    select
-     planet_id,
-     planet_layer_id,
-     item_name,
-     material_rarity,
-     total_amount,
-     prepared_amount,
-     extracted_amount,
-     preparable_amount,
-     extractable_amount,
-     case
-       when total_amount < 2000 then 'small'
-       when total_amount >= 2000 and total_amount < 4000 then 'medium'
-       when total_amount >= 4000 then 'large'
-     end as size
-    from planet_deposits_discovered
- ) pdd on pd.planet_layer_id = pdd.planet_layer_id and s.size = pdd.size;
+ left join planet_deposits_discovered pdd on p.planet_id = pdd.planet_id and pd.planet_layer_id = pdd.planet_layer_id
+ left join planet_deposits_undiscovered pdu on pd.planet_layer_id = pdu.planet_layer_id;
 
 -- materials - list
 create or replace view vw_material_list as
