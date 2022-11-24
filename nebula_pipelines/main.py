@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, json
 import requests
 import numpy as np
 import pandas as pd
@@ -28,10 +28,11 @@ NebulaTokenClaimingCx = "cx4bfc45b11cf276bb58b3669076d99bc6b3e4e3b8"
 NebulaMultiTokenCx = "cx85954d0dae92b63bf5cba03a59ca4ffe687bad0a"
 # additional wallets
 NebulaNonCreditClaim = "hx888ed0ff5ebc119e586b5f3d4a0ef20eaa0ed123"
-NebulaMultiTokenTreasurer = "hx82ea662ea6e8484068f0d3c57ebab570cf6ce478"
-NebulaMultiTokenMinter = "hxfa1d8823122048bdd171687330d0d52e0c7b3e6b"
+NebulaShipUpgrade = "hxd46d44827c10876ee8c5464d7882205d6c3a492f"
+#NebulaMultiTokenTreasurer = "hx82ea662ea6e8484068f0d3c57ebab570cf6ce478"
+#NebulaMultiTokenMinter = "hxfa1d8823122048bdd171687330d0d52e0c7b3e6b"
 # contracts combined:
-NebulaCxList = [NebulaPlanetTokenCx, NebulaSpaceshipTokenCx, NebulaTokenClaimingCx, NebulaMultiTokenCx]
+NebulaCxList = [NebulaPlanetTokenCx, NebulaSpaceshipTokenCx, NebulaTokenClaimingCx, NebulaMultiTokenCx, NebulaShipUpgrade]
 
 # connect to ICON main-net
 icon_service = IconService(HTTPProvider("https://ctz.solidwallet.io", 3))
@@ -44,6 +45,15 @@ def hex_to_int(hex) -> int:
             return int(hex, 16)
         else:
             return int(hex)
+    except:
+        return None
+
+def hex_to_string(hex) -> str:
+    try:
+        if hex[:2] == '0x':
+            hex = hex[2:]
+        string_value = bytes.fromhex(hex).decode('utf-8')
+        return string_value
     except:
         return None
 
@@ -547,7 +557,6 @@ def pull_item_data():
     )
 
 def pull_blocks_history(data_type: str, address: str):    
-    #truncate_table("blocks_history")
     n = 0
     blocks_history_list = []
 
@@ -630,7 +639,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [58048895]
+    blocks = [57817120,57818247,58048895,58360194]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type
@@ -642,8 +651,8 @@ def pull_nebula_txns():
     #for row in query_results:
     #    block_height = row.block_number
     
-    while True:
-    #for block_height in blocks:
+    #while True:
+    for block_height in blocks:
         try:
             block = icon_service.get_block(block_height)
             print("block:", block_height)
@@ -666,7 +675,7 @@ def pull_nebula_txns():
 
                                 # add delay to avoid error msg below after ICON 2.0 upgrade
                                 # iconsdk.exception.JSONRPCException: {'code': -31003, 'message': 'Executing : Executing'}
-                                sleep(2)
+                                sleep(3)
                                 
                                 # check if tx was successful - if not skip and move on
                                 txResult = icon_service.get_transaction_result(tx["txHash"])
@@ -681,6 +690,16 @@ def pull_nebula_txns():
                                 df_tx = pd.json_normalize(tx, max_level=1, sep="_")
                                 df_tx["block_height"] = block_height
                                 df_tx["idx"] = block_height * 100000000 + n # generated PK
+
+                                if "data" in tx:
+                                    # ship upgrades are hex encoded - check & convert if necessary
+                                    tx_data = hex_to_string(tx["data"])
+                                    if tx_data:
+                                        df_tx_data = pd.json_normalize(json.loads(tx_data), sep="_")
+                                    else:
+                                        df_tx_data = pd.json_normalize(tx["data"], sep="_")
+                                else:
+                                    df_tx_data = pd.DataFrame() # empty df to everwrite anything from previous loop iteration
                                 
                                 # fields requiring extra attention:
                                 if "value" in df_tx:
@@ -692,6 +711,9 @@ def pull_nebula_txns():
                                     df_tx["data_params"] = df_tx["data_params"].apply(dict_to_str) # upsert function won't allow dict values
                                 else:
                                     df_tx["data_params"] = None
+                                
+                                if "method" in df_tx_data:
+                                    df_tx["data_method"] = df_tx_data["method"].apply(lambda s: s.lower())
                                 
                                 if "data_content" not in df_tx:
                                     df_tx["data_contentType"] = None
@@ -727,8 +749,7 @@ def pull_nebula_txns():
                                 # -----------------------
                                 # trxn_data
                                 # -----------------------
-                                if "data" in tx:
-                                    df_tx_data = pd.json_normalize(tx["data"], sep="_")
+                                if not df_tx_data.empty:                                    
                                     # expected column list:
                                     tx_data_columns=[
                                         "block_height", "txHash", "method", "tokenId",
@@ -750,6 +771,9 @@ def pull_nebula_txns():
                                     df_tx_data["txHash"] = df_tx["txHash"]
                                     df_tx_data["tokenId"] = df_tx_data["params__tokenId"].replace(np.nan, "") + df_tx_data["params__token_id"].replace(np.nan, "")
                                     df_tx_data["tokenId"] = df_tx_data["tokenId"].apply(hex_to_int)
+                                    if "ship_id" in df_tx_data:
+                                        df_tx_data["tokenId"] = df_tx_data["ship_id"]
+                                    df_tx_data["method"] = df_tx_data["method"].apply(lambda s: s.lower())
                                     tx_data_list.append(df_tx_data)
                                 
                                     # -----------------------
@@ -848,10 +872,12 @@ def pull_api_data():
 
 
 ############################################
+#truncate_table("blocks_history")
 #pull_blocks_history(data_type="planet", address=NebulaPlanetTokenCx)
 #pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
 #pull_blocks_history(data_type="ship", address=NebulaSpaceshipTokenCx)
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
+pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
 
-pull_api_data()
+#pull_api_data()
 #pull_nebula_txns()
