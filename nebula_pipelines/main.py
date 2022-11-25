@@ -639,10 +639,11 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    blocks = [57817120,57818247,58048895,58360194]
+    #blocks = [57817120,57818247,58048895,58360194]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type
+    #block_height = 57817120 # first gen-1 ship upgrade
 
     # loop through historical blocks
     #sql = f"select distinct block_number from blocks_history where block_number >= {block_height} order by block_number;"
@@ -651,8 +652,8 @@ def pull_nebula_txns():
     #for row in query_results:
     #    block_height = row.block_number
     
-    #while True:
-    for block_height in blocks:
+    while True:
+    #for block_height in blocks:
         try:
             block = icon_service.get_block(block_height)
             print("block:", block_height)
@@ -700,6 +701,7 @@ def pull_nebula_txns():
                                         df_tx_data = pd.json_normalize(tx["data"], sep="_")
                                 else:
                                     df_tx_data = pd.DataFrame() # empty df to everwrite anything from previous loop iteration
+                                    #continue # temp to only load ship uprades
                                 
                                 # fields requiring extra attention:
                                 if "value" in df_tx:
@@ -877,7 +879,7 @@ def pull_api_data():
 #pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
 #pull_blocks_history(data_type="ship", address=NebulaSpaceshipTokenCx)
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
-pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
+#pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
 
 #pull_api_data()
-#pull_nebula_txns()
+pull_nebula_txns()
