@@ -556,44 +556,6 @@ def pull_item_data():
         extra_update_fields={"updated_at": "NOW()"}
     )
 
-def pull_blocks_history(data_type: str, address: str):    
-    n = 0
-    blocks_history_list = []
-
-    while True:
-        print("pull page progress:", n)
-
-        api_url = f"https://tracker.icon.community/api/v1/transactions/address/{address}?limit=100&skip={n}"
-        api_response = requests.get(api_url)
-
-        if api_response.status_code != 200:
-            print("Unprocessable request")
-            break
-
-        if not "block_number" in api_response.text:
-            print("empty")
-            break
-
-        for t in api_response.json():
-            #print(t["block_number"])
-            blocks_history_list.append([data_type, t["block_number"]])
-
-        # write to db
-        df_blocks_history = pd.DataFrame(blocks_history_list, columns=["data_type","block_number"])
-        df_blocks_history = df_blocks_history.drop_duplicates()
-        #df_blocks_history.to_csv("./tests/samples/blocks_history.csv", index=False)
-
-        # prep and upsert data
-        data_transform_and_load(
-            df_to_load=df_blocks_history,
-            table_name="blocks_history",
-            list_of_col_names=[
-                "data_type","block_number"
-            ]
-        )
-
-        n += 100
-
 
 ############################################
 def pull_item_owners():
@@ -631,6 +593,46 @@ def pull_item_owners():
         ],
         extra_update_fields={"updated_at": "NOW()"}
     )
+
+
+############################################
+def pull_blocks_history(data_type: str, address: str):    
+    n = 0
+    blocks_history_list = []
+
+    while True:
+        print("pull page progress:", n)
+
+        api_url = f"https://tracker.icon.community/api/v1/transactions/address/{address}?limit=100&skip={n}"
+        api_response = requests.get(api_url)
+
+        if api_response.status_code != 200:
+            print("Unprocessable request")
+            break
+
+        if not "block_number" in api_response.text:
+            print("empty")
+            break
+
+        for t in api_response.json():
+            #print(t["block_number"])
+            blocks_history_list.append([data_type, t["block_number"]])
+
+        # write to db
+        df_blocks_history = pd.DataFrame(blocks_history_list, columns=["data_type","block_number"])
+        df_blocks_history = df_blocks_history.drop_duplicates()
+        #df_blocks_history.to_csv("./tests/samples/blocks_history.csv", index=False)
+
+        # prep and upsert data
+        data_transform_and_load(
+            df_to_load=df_blocks_history,
+            table_name="blocks_history",
+            list_of_col_names=[
+                "data_type","block_number"
+            ]
+        )
+
+        n += 100
 
 
 ############################################
@@ -776,6 +778,22 @@ def pull_nebula_txns():
                                     if "ship_id" in df_tx_data:
                                         df_tx_data["tokenId"] = df_tx_data["ship_id"]
                                     df_tx_data["method"] = df_tx_data["method"].apply(lambda s: s.lower())
+
+                                    # additional updates from hex to int / numeric
+                                    df_tx_data["params__orderId"] = df_tx_data["params__orderId"].apply(hex_to_int)
+                                    df_tx_data["params__amount"] = df_tx_data["params__amount"].apply(hex_to_int)
+                                    
+                                    df_tx_data["params__price"] = df_tx_data["params__price"].apply(hex_to_int) # step 1: from hex to int (loop)
+                                    df_tx_data["params__price"] = df_tx_data["params__price"].apply(loop_to_numeric) # step 2: from loop to icx
+                                    
+                                    df_tx_data["params__starting_price"] = df_tx_data["params__starting_price"].apply(hex_to_int) # step 1: from hex to int (loop)
+                                    df_tx_data["params__starting_price"] = df_tx_data["params__starting_price"].apply(loop_to_numeric) # step 2: from loop to icx
+                                    
+                                    df_tx_data["params__duration_in_hours"] = df_tx_data["params__duration_in_hours"].apply(hex_to_int)
+                                    df_tx_data["params__id"] = df_tx_data["params__id"].apply(hex_to_int)
+                                    df_tx_data["params__value"] = df_tx_data["params__value"].apply(hex_to_int)
+                                    df_tx_data["params__transferId"] = df_tx_data["params__transferId"].apply(hex_to_int)
+
                                     tx_data_list.append(df_tx_data)
                                 
                                     # -----------------------
@@ -874,12 +892,50 @@ def pull_api_data():
 
 
 ############################################
+def convert_trxn_data():
+    conn = db_engine.connect()
+    df_tx_data = pd.read_sql_table("trxn_data", conn)
+    
+    df_tx_data["params__order_id"] = df_tx_data["params__order_id"].apply(hex_to_int)
+    df_tx_data["params__amount"] = df_tx_data["params__amount"].apply(hex_to_int)
+    
+    df_tx_data["params__price"] = df_tx_data["params__price"].apply(hex_to_int) # step 1: from hex to int (loop)
+    df_tx_data["params__price"] = df_tx_data["params__price"].apply(loop_to_numeric) # step 2: from loop to icx
+    
+    df_tx_data["params__starting_price"] = df_tx_data["params__starting_price"].apply(hex_to_int) # step 1: from hex to int (loop)
+    df_tx_data["params__starting_price"] = df_tx_data["params__starting_price"].apply(loop_to_numeric) # step 2: from loop to icx
+    
+    df_tx_data["params__duration_in_hours"] = df_tx_data["params__duration_in_hours"].apply(hex_to_int)
+    df_tx_data["params__id"] = df_tx_data["params__id"].apply(hex_to_int)
+    df_tx_data["params__value"] = df_tx_data["params__value"].apply(hex_to_int)
+    df_tx_data["params__transfer_id"] = df_tx_data["params__transfer_id"].apply(hex_to_int)
+
+    #df_tx_data.to_csv("./tests/samples/tx_data.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_tx_data,
+        table_name="trxn_data",
+        list_of_col_names=[
+            "tx_data_id", "tx_hash","block_height","method","token_id","params__to",
+            "params__token_id","params__token_id_2","params__order_id","params__amount",
+            "params__price","params__starting_price","params__duration_in_hours",
+            "params__address", "params__token_uri", "params_tx_hash",
+            "params__id","params__from","params__value","params__owner",
+            "params__ids","params__amounts","params__transfer_id"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+
+############################################
 #truncate_table("blocks_history")
 #pull_blocks_history(data_type="planet", address=NebulaPlanetTokenCx)
 #pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
 #pull_blocks_history(data_type="ship", address=NebulaSpaceshipTokenCx)
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
 #pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
+#convert_trxn_data()
 
 #pull_api_data()
 pull_nebula_txns()
