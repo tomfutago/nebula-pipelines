@@ -250,7 +250,17 @@ create table if not exists trxn_events (
     data varchar(1000) null,
     tx_index smallint not null,
 	created_at timestamp not null default current_timestamp,
-    updated_at timestamp null
+    updated_at timestamp null,
+    address_1 varchar(50) null,
+    address_2 varchar(50) null,
+    address_3 varchar(50) null,
+    amount_1 varchar(50) null,
+    amount_2 varchar(50) null,
+    amount_3 varchar(50) null,
+    amount_4 varchar(50) null,
+    string_1 varchar(1000) null,
+    bytes_1 varchar(500) null,
+    bytes_2 varchar(500) null
 );
 
 

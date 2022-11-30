@@ -929,6 +929,259 @@ def convert_trxn_data():
 
 
 ############################################
+def convert_trxn_events():
+    conn = db_engine.connect()
+    df_tx_events = pd.read_sql_table("trxn_events", conn)
+    
+    # -----------------------------------------------
+    # Approval
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Approval(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Approval(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], x[0].split(",")[4], hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # AssignRole
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("AssignRole(str,Address)", regex=False), 
+        ["indexed", "string_1", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("AssignRole(str,Address)", regex=False), 
+        ["indexed", "string_1", "address_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[2], x[0].split(",")[3][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # BuyTokens
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("BuyTokens(int,int,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "amount_1", "amount_2", "address_1", "address_2", "amount_3", "amount_4"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("BuyTokens(int,int,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "amount_1", "amount_2", "address_1", "address_2", "amount_3", "amount_4"]
+    ].apply(
+        lambda x: [
+            x[0], x[1], 
+            hex_to_int(x[0].split(",")[6]), hex_to_int(x[0].split(",")[7][:-1]),
+            x[1].split(",")[0][1:], x[1].split(",")[1],
+            hex_to_int(x[1].split(",")[2]), hex_to_int(x[1].split(",")[3][:-1])
+        ]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # CancelOrder
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CancelOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CancelOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ].apply(
+        lambda x: [x[0], hex_to_int(x[0].split(",")[2]), x[0].split(",")[3][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # CreateBuyOrder
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CreateBuyOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CreateBuyOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ].apply(
+        lambda x: [x[0], hex_to_int(x[0].split(",")[2]), x[0].split(",")[3][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # CreateSellOrder
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CreateSellOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("CreateSellOrder(int,Address)", regex=False), 
+        ["indexed", "amount_1", "address_1"]
+    ].apply(
+        lambda x: [x[0], hex_to_int(x[0].split(",")[2]), x[0].split(",")[3][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # DelistToken
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("DelistToken(Address,int)", regex=False), 
+        ["indexed", "address_1", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("DelistToken(Address,int)", regex=False), 
+        ["indexed", "address_1", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[2], hex_to_int(x[0].split(",")[3][:-1])]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # DepositReceived
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("DepositReceived(Address)", regex=False), 
+        ["indexed", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("DepositReceived(Address)", regex=False), 
+        ["indexed", "address_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[1][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # ICXTransfer
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("ICXTransfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("ICXTransfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], x[0].split(",")[4], hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # ListToken
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("ListToken(Address,int,int)", regex=False), 
+        ["indexed", "address_1", "amount_1", "amount_2"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("ListToken(Address,int,int)", regex=False), 
+        ["indexed", "address_1", "amount_1", "amount_2"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], hex_to_int(x[0].split(",")[4]), hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # PurchaseToken
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("PurchaseToken(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("PurchaseToken(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], x[0].split(",")[4], hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # SellTokens
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("SellTokens(int,int,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "amount_1", "amount_2", "address_1", "address_2", "amount_3", "amount_4"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("SellTokens(int,int,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "amount_1", "amount_2", "address_1", "address_2", "amount_3", "amount_4"]
+    ].apply(
+        lambda x: [
+            x[0], x[1], 
+            hex_to_int(x[0].split(",")[6]), hex_to_int(x[0].split(",")[7][:-1]),
+            x[1].split(",")[0][1:], x[1].split(",")[1],
+            hex_to_int(x[1].split(",")[2]), hex_to_int(x[1].split(",")[3][:-1])
+        ]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # SetNonFungibleTokenContractAddress
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("SetNonFungibleTokenContractAddress(Address)", regex=False), 
+        ["indexed", "address_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("SetNonFungibleTokenContractAddress(Address)", regex=False), 
+        ["indexed", "address_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[1][:-1]]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # TokenTransfer
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TokenTransfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TokenTransfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], x[0].split(",")[4], hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+
+    # -----------------------------------------------
+    # Transfer
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Transfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Transfer(Address,Address,int)", regex=False), 
+        ["indexed", "address_1", "address_2", "amount_1"]
+    ].apply(
+        lambda x: [x[0], x[0].split(",")[3], x[0].split(",")[4], hex_to_int(x[0].split(",")[5][:-1])]
+    , axis=1, result_type="broadcast")
+
+    # -----------------------------------------------
+    # TransferBatch
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TransferBatch(Address,Address,Address,bytes,bytes)", regex=False), 
+        ["indexed", "data", "address_1", "address_2", "address_3", "bytes_1", "bytes_2"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TransferBatch(Address,Address,Address,bytes,bytes)", regex=False), 
+        ["indexed", "data", "address_1", "address_2", "address_3", "bytes_1", "bytes_2"]
+    ].apply(
+        lambda x: [
+            x[0], x[1], x[0].split(",")[5], x[0].split(",")[6], x[0].split(",")[7], 
+            hex_to_int(x[1].split(",")[0][1:]), hex_to_int(x[1].split(",")[1][:-1])
+        ]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # TransferSingle
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TransferSingle(Address,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "address_1", "address_2", "address_3", "amount_1", "amount_2"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("TransferSingle(Address,Address,Address,int,int)", regex=False), 
+        ["indexed", "data", "address_1", "address_2", "address_3", "amount_1", "amount_2"]
+    ].apply(
+        lambda x: [
+            x[0], x[1], x[0].split(",")[5], x[0].split(",")[6], x[0].split(",")[7], 
+            hex_to_int(x[1].split(",")[0][1:]), hex_to_int(x[1].split(",")[1][:-1])
+        ]
+    , axis=1, result_type="broadcast")
+    
+    # -----------------------------------------------
+    # Withdraw
+    df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Withdraw(int)", regex=False), 
+        ["indexed", "amount_1"]
+    ] = df_tx_events.loc[
+        df_tx_events["indexed"].str.contains("Withdraw(int)", regex=False), 
+        ["indexed", "amount_1"]
+    ].apply(
+        lambda x: [x[0], hex_to_int(x[0].split(",")[1][:-1])]
+    , axis=1, result_type="broadcast")
+
+    # -----------------------------------------------
+    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+
+    # prep and upsert data
+    data_transform_and_load(
+        df_to_load=df_tx_events,
+        table_name="trxn_events",
+        list_of_col_names=[
+            "tx_event_id","block_height","status","to_address","score_address",
+            "indexed","data","tx_hash","tx_index","address_1","address_2","address_3",
+            "amount_1","amount_2","amount_3","amount_4","string_1","bytes_1","bytes_2"
+        ],
+        extra_update_fields={"updated_at": "NOW()"}
+    )
+
+
+############################################
 #truncate_table("blocks_history")
 #pull_blocks_history(data_type="planet", address=NebulaPlanetTokenCx)
 #pull_blocks_history(data_type="claim", address=NebulaTokenClaimingCx)
@@ -936,6 +1189,7 @@ def convert_trxn_data():
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
 #pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
 #convert_trxn_data()
+convert_trxn_events()
 
 #pull_api_data()
-pull_nebula_txns()
+#pull_nebula_txns()
