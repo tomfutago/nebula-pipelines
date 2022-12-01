@@ -406,8 +406,8 @@ create or replace view vw_planet_owner_deposit_stats as
 select
  po.owner,
  po.owner_o,
- sum(case when pdu.planet_layer_id is not null then 1 else 0 end) as undiscovered_count,
- sum(case when pdd.planet_layer_id is not null then 1 else 0 end) as discovered_count,
+ count(distinct case when pdu.planet_layer_id is not null then pdu.id end) as undiscovered_count,
+ count(distinct case when pdd.planet_layer_id is not null then pdd.planet_layer_material_id end) as discovered_count,
  sum(case when pdd.prepared_amount = pdd.total_amount then 1 else 0 end) as prepared_count,
  sum(case when pdd.extracted_amount = pdd.total_amount then 1 else 0 end) as extracted_count
 from vw_planet_owners po
