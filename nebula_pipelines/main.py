@@ -641,7 +641,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [57817120,57818247,58048895,58360194]
+    #blocks = [57818225,50645440,50645440,50647584]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type
@@ -835,6 +835,11 @@ def pull_nebula_txns():
                                         meta=["blockHeight", "status", "to", "txHash", "txIndex"],
                                         sep="_"
                                     )
+                        
+                                    # skip if: 'eventLogs': []
+                                    if df_tx_events.empty:
+                                        continue
+
                                     df_tx_events["idx"] = block_height * 100000000 + n * 100 + df_tx_events.index + 1 # generated PK
                                     tx_event_list.append(df_tx_events)
 
@@ -860,6 +865,9 @@ def pull_nebula_txns():
                                         },
                                         extra_update_fields={"updated_at": "NOW()"}
                                     )
+
+                                    # extract data from indexed
+                                    convert_trxn_events(block_height)
                             except:
                                 #send to log webhook
                                 err_msg = "{}. {}, line: {}".format(sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2].tb_lineno)
@@ -929,9 +937,12 @@ def convert_trxn_data():
 
 
 ############################################
-def convert_trxn_events():
+def convert_trxn_events(block_height: str = "All"):
     conn = db_engine.connect()
-    df_tx_events = pd.read_sql_table("trxn_events", conn)
+    if block_height == "All":
+        df_tx_events = pd.read_sql_table("trxn_events", conn)
+    else:
+        df_tx_events = pd.read_sql(f"select * from trxn_events where block_height = {block_height}", conn)
     
     # -----------------------------------------------
     # Approval
@@ -1189,7 +1200,7 @@ def convert_trxn_events():
 #pull_blocks_history(data_type="multi", address=NebulaMultiTokenCx)
 #pull_blocks_history(data_type="ship_upgrade", address=NebulaShipUpgrade)
 #convert_trxn_data()
-convert_trxn_events()
+#convert_trxn_events()
 
 #pull_api_data()
-#pull_nebula_txns()
+pull_nebula_txns()
