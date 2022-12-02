@@ -1,3 +1,4 @@
-alter table trxn_events alter column string_1 type varchar(1000);
-alter table trxn_events alter column bytes_1 type varchar(1000);
-alter table trxn_events alter column bytes_2 type varchar(1000);
+create or replace view vw_planet_deposits_undiscovered as
+select pd.planet_id, pdu.planet_layer_id
+from planet_deposits pd
+ join planet_deposits_undiscovered pdu on pd.planet_layer_id = pdu.planet_layer_id;

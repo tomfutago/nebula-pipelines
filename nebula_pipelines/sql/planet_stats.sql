@@ -401,6 +401,12 @@ select 4, owner, owner_o, concat('largest radius - ', planet_link, ': ', radius,
 select 5, owner, owner_o, concat('biggest mass - ', planet_link, ': ', mass, 'kg') from ff_cte where rn_mass = 1 union
 select 6, owner, owner_o, concat('greatest gravity - ', planet_link, ': ', gravity, 'm/s^2') from ff_cte where rn_gravity = 1;
 
+-- helper view used in delete_from_planet_deposits_undiscovered function
+create or replace view vw_planet_deposits_undiscovered as
+select pd.planet_id, pdu.planet_layer_id
+from planet_deposits pd
+ join planet_deposits_undiscovered pdu on pd.planet_layer_id = pdu.planet_layer_id;
+
 -- planet surveying - totals
 create or replace view vw_planet_owner_deposit_stats as
 select

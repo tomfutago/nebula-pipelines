@@ -163,7 +163,7 @@ def get_table_max_val(table_name: str, column_name: str):
     """
     Get MAX(column_name) for given table_name
     """
-    sql = 'select max({}) as max_val from {}.{};'.format(column_name, db_schema, table_name)
+    sql = f"select max({column_name}) as max_val from {db_schema}.{table_name};"
     with db_engine.connect() as conn:
         result = conn.execute(statement=sql)
         for row in result:
@@ -176,7 +176,31 @@ def truncate_table(table_name: str):
     """
     Truncate data in given table_name
     """
-    sql = 'truncate table {}.{};'.format(db_schema, table_name)
+    sql = f"truncate table {db_schema}.{table_name};"
+    with db_engine.connect() as conn:
+        conn.execution_options(autocommit=True)
+        conn.execute(statement=sql)
+
+def delete_from_table(table_name: str, int_column_name: str, value: int):
+    """
+    Delete data from given table_name based on
+    condition build on int_column_name and value
+    """
+    sql = f"delete from {db_schema}.{table_name} where {int_column_name} = {value};"
+    with db_engine.connect() as conn:
+        conn.execution_options(autocommit=True)
+        conn.execute(statement=sql)
+
+def delete_from_planet_deposits_undiscovered(planet_id: int, batch: int):
+    """
+    Delete data from planet_deposits_undiscovered table
+    """
+    sql = f"delete from {db_schema}.planet_deposits_undiscovered \
+            where planet_layer_id in ( \
+                select planet_layer_id \
+                from vw_planet_deposits_undiscovered \
+                where planet_id between {planet_id - batch} and {planet_id} \
+            );"
     with db_engine.connect() as conn:
         conn.execution_options(autocommit=True)
         conn.execute(statement=sql)
@@ -249,8 +273,9 @@ def pull_planet_data():
             if not dfc.empty:
                 planet_collectibles_list.append(dfc)
         
-        # write to db in batches per 1000 records
-        if tokenId % 1000 == 0 or tokenId == totalSupply:
+        # write to db in batches
+        batch = 1000
+        if tokenId % batch == 0 or tokenId == totalSupply:
             # -----------------------
             df_planets = pd.concat(planet_list)
             #df_planets.to_csv("./tests/samples/planets.csv", index=False)
@@ -362,6 +387,9 @@ def pull_planet_data():
             df_planet_deposits_undiscovered = pd.concat(planet_deposit_undiscovered_list)
             df_planet_deposits_undiscovered["idx"] = df_planet_deposits_undiscovered["planet_layer_id"] * 1000000 + df_planet_deposits_undiscovered.index + 1 # generated PK
             #df_planet_deposits_undiscovered.to_csv("./tests/samples/deposits_undiscovered.csv", index=False)
+
+            # delete records for the current batch (to avoid keeping records with deposits discovered since last run)
+            delete_from_planet_deposits_undiscovered(planet_id=tokenId, batch=batch)
 
             # prep and upsert data
             data_transform_and_load(
@@ -1202,5 +1230,5 @@ def convert_trxn_events(block_height: str = "All"):
 #convert_trxn_data()
 #convert_trxn_events()
 
-#pull_api_data()
-pull_nebula_txns()
+pull_api_data()
+#pull_nebula_txns()
