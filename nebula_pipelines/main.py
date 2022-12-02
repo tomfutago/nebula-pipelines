@@ -234,6 +234,9 @@ def pull_planet_data():
     planet_deposit_discovered_list = []
     planet_deposit_undiscovered_list = []
 
+    # flush planet_deposits_undiscovered_stage table
+    truncate_table("planet_deposits_undiscovered_stage")
+
     for tokenId in range(1, totalSupply + 1):
         #tokenInfo = requests.get(call(NebulaPlanetTokenCx, "tokenURI", {"_tokenId": tokenId})).json()
         api_url = "https://api.projectnebula.app/planets/v3/" + str(tokenId)
@@ -274,8 +277,7 @@ def pull_planet_data():
                 planet_collectibles_list.append(dfc)
         
         # write to db in batches
-        batch = 1000
-        if tokenId % batch == 0 or tokenId == totalSupply:
+        if tokenId % 1000 == 0 or tokenId == totalSupply:
             # -----------------------
             df_planets = pd.concat(planet_list)
             #df_planets.to_csv("./tests/samples/planets.csv", index=False)
@@ -388,13 +390,10 @@ def pull_planet_data():
             df_planet_deposits_undiscovered["idx"] = df_planet_deposits_undiscovered["planet_layer_id"] * 1000000 + df_planet_deposits_undiscovered.index + 1 # generated PK
             #df_planet_deposits_undiscovered.to_csv("./tests/samples/deposits_undiscovered.csv", index=False)
 
-            # delete records for the current batch (to avoid keeping records with deposits discovered since last run)
-            delete_from_planet_deposits_undiscovered(planet_id=tokenId, batch=batch)
-
             # prep and upsert data
             data_transform_and_load(
                 df_to_load=df_planet_deposits_undiscovered,
-                table_name="planet_deposits_undiscovered",
+                table_name="planet_deposits_undiscovered_stage",
                 list_of_col_names=[
                     "id","planet_layer_id","size","image_path"
                 ],
@@ -412,6 +411,15 @@ def pull_planet_data():
             planet_deposit_list = []
             planet_deposit_discovered_list = []
             planet_deposit_undiscovered_list = []
+
+    # flush planet_deposits_undiscovered table..
+    truncate_table("planet_deposits_undiscovered")
+    
+    # .. and re-fill planet_deposits_undiscovered from stage
+    sql = f"insert into {db_schema}.planet_deposits_undiscovered select * from {db_schema}.planet_deposits_undiscovered_stage;"
+    with db_engine.connect() as conn:
+        conn.execution_options(autocommit=True)
+        conn.execute(statement=sql)
 
 
 ############################################
