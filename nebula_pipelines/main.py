@@ -677,7 +677,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [57818225,50645440,50645440,50647584]
+    #blocks = [59118826,59118864,59119131,59119162,59122153]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type
@@ -1213,7 +1213,7 @@ def convert_trxn_events(block_height: str = "All"):
     , axis=1, result_type="broadcast")
 
     # -----------------------------------------------
-    df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
+    #df_tx_events.to_csv("./tests/samples/txn_events.csv", index=False)
 
     # prep and upsert data
     data_transform_and_load(
@@ -1238,5 +1238,5 @@ def convert_trxn_events(block_height: str = "All"):
 #convert_trxn_data()
 #convert_trxn_events()
 
-pull_api_data()
-#pull_nebula_txns()
+#pull_api_data()
+pull_nebula_txns()
