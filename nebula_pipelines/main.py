@@ -677,7 +677,7 @@ def pull_nebula_txns():
     block_height = get_table_max_val(table_name="trxn", column_name="block_height")
     #block_height = icon_service.get_block("latest")["height"]
 
-    #blocks = [59118826,59118864,59119131,59119162,59122153]
+    #blocks = [59205046,59220034]
     #blocks.reverse()
 
     #block_height = 57633618 # deposit without data_type
