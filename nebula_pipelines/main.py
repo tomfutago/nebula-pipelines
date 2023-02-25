@@ -617,7 +617,7 @@ def pull_item_owners():
     truncate_table("item_owners")
 
     # write to db
-    df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"])
+    df_item_owners = pd.DataFrame(item_owner_list, columns=["item_id","owner","total"]).drop_duplicates()
     #df_item_owners.to_csv("./tests/samples/item_owners.csv", index=False)
 
     # prep and upsert data
@@ -918,7 +918,7 @@ def pull_nebula_txns():
 
 
 ############################################
-def pull_api_data():
+def pull_api_data(run_once: bool = False):
     while True:
         try:
             pull_planet_data()
@@ -927,6 +927,8 @@ def pull_api_data():
             pull_ship_owners()
             pull_item_data()
             pull_item_owners()
+            if run_once:
+                break
             sleep(600) # 10 minutes delay before next iteration
         except:
             #send to log webhook
@@ -1238,5 +1240,5 @@ def convert_trxn_events(block_height: str = "All"):
 #convert_trxn_data()
 #convert_trxn_events()
 
-#pull_api_data()
-pull_nebula_txns()
+pull_api_data(run_once=False)
+#pull_nebula_txns()
